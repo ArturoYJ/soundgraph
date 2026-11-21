@@ -1,0 +1,11 @@
+.env
+.env.*
+**/__pycache__/
+.pytest_cache/
+.git/
+.venv/
+Agents/
+Context/
+docs/
+*.md
+soundgraph_schema.cypher

@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:17-bookworm@sha256:837bed18782820fe967067cb5328b02b0d9992c1be9a37ee0c9c492cfc03af3b
+    environment:
+      POSTGRES_DB: soundgraph
+      POSTGRES_USER: soundgraph
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Ejecute python3 -m scripts.init_env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U soundgraph -d soundgraph"]
+      interval: 3s
+      timeout: 3s
+      retries: 25
+  mongo:
+    image: mongo:8.0@sha256:479e85ced54ffb8a40dade1dcde2da2a9ae858515b9415e9cc54bfb8f0575d01
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: soundgraph
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Ejecute python3 -m scripts.init_env}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping: 1}).ok === 1 ? 0 : 1)"]
+      interval: 3s
+      timeout: 4s
+      retries: 25
+  neo4j:
+    image: neo4j:5.26.33-community@sha256:51d0314ef86074f519003da8dd4daaa9fff72b8479672b742d7cab7f3064e3ed
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 384m
+      NEO4J_server_memory_pagecache_size: 128m
+      NEO4J_dbms_usage__report_enabled: "false"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--timeout=2", "--output-document=/dev/null", "http://127.0.0.1:7474/"]
+      interval: 3s
+      timeout: 4s
+      retries: 30
+  tools:
+    build: .
+    profiles: [tools]
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:?Ejecute python3 -m scripts.init_env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+  api:
+    build: .
+    env_file:
+      - path: .env.demo
+        required: false
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:?Ejecute python3 -m scripts.init_env}
+      SOUNDGRAPH_API_PORT: ${SOUNDGRAPH_API_PORT:-8000}
+    ports:
+      - "127.0.0.1:${SOUNDGRAPH_API_PORT:-8000}:8000"
+    command: ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-proxy-headers"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=8).close()"]
+      interval: 5s
+      timeout: 9s
+      retries: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  mongo_data:
+  neo4j_data:

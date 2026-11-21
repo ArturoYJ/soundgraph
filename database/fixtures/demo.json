@@ -1,0 +1,26 @@
+{
+  "profiles": [
+    {"id": "p-ana-main", "name": "Ana", "role": "listener"},
+    {"id": "p-sofia", "name": "Sofía", "role": "listener"},
+    {"id": "p-new", "name": "Perfil nuevo", "role": "listener"},
+    {"id": "p-editor", "name": "Editor", "role": "editor"}
+  ],
+  "songs": [
+    {"_id": "c-soWhat", "title": "So What", "editorial": {"credits": [{"name": "Miles Davis", "role": "artista"}]}},
+    {"_id": "c-allBlues", "title": "All Blues", "editorial": {"credits": [{"name": "Miles Davis", "role": "artista"}]}},
+    {"_id": "c-cream", "title": "C.R.E.A.M.", "editorial": {
+      "credits": [{"name": "Wu-Tang Clan", "role": "artista"}],
+      "notes": [{"text": "Ficha de demostración para probar recomendaciones por escuchas compartidas.", "source": "Semilla académica de SoundGraph"}]
+    }}
+  ],
+  "listens": [
+    {"profileId": "p-ana-main", "songId": "c-soWhat"},
+    {"profileId": "p-ana-main", "songId": "c-allBlues"},
+    {"profileId": "p-sofia", "songId": "c-soWhat"},
+    {"profileId": "p-sofia", "songId": "c-allBlues"},
+    {"profileId": "p-sofia", "songId": "c-cream"}
+  ],
+  "playlists": [
+    {"id": "pl-ana-demo", "ownerId": "p-ana-main", "name": "Para escuchar"}
+  ]
+}

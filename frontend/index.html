@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2eb">
+  <title>SoundGraph</title>
+  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script src="/assets/app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="topbar">
+      <div class="brand"><span class="wordmark">SoundGraph</span> <span class="mode">Modo demo</span></div>
+      <nav id="nav" aria-label="Principal" hidden>
+        <a id="discover-link" href="#/descubrir">Descubrir</a>
+        <a id="lists-link" href="#/playlists">Mis playlists</a>
+      </nav>
+      <div class="account" id="account" hidden>
+        <span id="avatar" class="avatar" aria-hidden="true"></span>
+        <span id="profile-name"></span>
+        <button id="logout" class="button quiet compact" type="button">Salir</button>
+      </div>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <section id="login" class="login surface" aria-labelledby="login-title" hidden>
+      <h1 id="login-title" tabindex="-1">Entra a la demo</h1>
+      <p class="muted">Los perfiles y las escuchas son datos de prueba.</p>
+      <form id="login-form">
+        <label for="profile">Perfil</label>
+        <select id="profile" name="profileId" required>
+          <option value="">Selecciona un perfil</option>
+          <option value="p-ana-main">Ana</option>
+          <option value="p-sofia">Sofía</option>
+          <option value="p-new">Perfil nuevo</option>
+          <option value="p-editor">Editor</option>
+        </select>
+        <label for="code">Código de acceso</label>
+        <input id="code" name="code" type="password" maxlength="128" required autocomplete="off" spellcheck="false">
+        <p id="login-warning" class="notice error" role="alert" hidden></p>
+        <button id="login-submit" class="button primary" type="submit">Entrar</button>
+      </form>
+    </section>
+    <div id="notification" class="notification" hidden><span id="notification-text" role="status"></span><a id="notification-link" class="button quiet compact" hidden>Ver playlist</a></div>
+    <section id="view" class="view"><p class="muted" role="status">Comprobando la sesión…</p></section>
+    <noscript>Activa JavaScript para usar la demo de SoundGraph.</noscript>
+  </main>
+  <dialog id="sheet" class="sheet" aria-labelledby="sheet-title"></dialog>
+</body>
+</html>

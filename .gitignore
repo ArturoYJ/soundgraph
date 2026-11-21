@@ -1,0 +1,27 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
+.venv/
+.DS_Store
+
+# Archivos locales de coordinación, fuera del repositorio público
+/Agents/
+/Context/
+
+# Capturas de evidencia conservadas solo localmente por ahora
+/docs/evidence/*.jpg
+/docs/evidence/*.jpeg
+/docs/evidence/*.png
+/docs/evidence/*.webp
+
+# Material histórico y notas de revisión solo locales
+/Analisis_SoundGraph_Revision_Grafos.md
+/actividad_soundgraph_completa.md
+/evaluacion_objetiva_soundgraph.md
+/opcion_b_analisis_profundo.md
+/opciones_dominio.md
+/soundgraph_schema.cypher
+/docs/evidence/2026-11-21-revision-prepublicacion.md
+/docs/frontend/stitch-export-selection.md
