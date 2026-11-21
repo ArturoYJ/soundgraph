@@ -11,9 +11,9 @@ Los enlaces corresponden al integrador, no a la práctica histórica de grafos. 
 | 5. Catálogo de operaciones y consultas | [Operaciones, resultados esperados y pruebas observadas](catalogo-operaciones.md). |
 | 6. Backend y API | [Rutas](../backend/main.py), [servicios](../backend/services/), [repositorios](../backend/repositories/) y [contrato](api/openapi.json). |
 | 7. Aplicación e integración | [Frontend](../frontend/) y [evidencia de recomendación, ficha, guardado y recarga](evidence/2026-11-21-h1-frontend.md). La gestión avanzada existe en la API; no se acredita como interfaz funcional. |
-| 8. Pruebas, documentación y despliegue | [Instrucciones de ejecución](../README.md#arranque-local), [configuración de ejemplo](../.env.example), [pruebas](../tests/), [medición de rendimiento](evidence/2026-11-21-rendimiento.md). Arranque local comprobado; no se acredita un repositorio remoto publicado. |
+| 8. Pruebas, documentación y despliegue | [Instrucciones de ejecución](../README.md#arranque-local), [configuración de ejemplo](../.env.example), [pruebas](../tests/), [medición de rendimiento](evidence/2026-11-21-rendimiento.md). Arranque local comprobado. Código y documentación en [ArturoYJ/soundgraph](https://github.com/ArturoYJ/soundgraph). |
 
-El **cartel final y el QR** se entregan por separado. Su enlace depende de la publicación del repositorio. La evidencia del integrador está en texto, código y datos de prueba; las capturas se conservan fuera de la selección pública.
+El **cartel final y el QR** se entregan por separado. El QR debe apuntar al repositorio y probarse antes de entregar el cartel. La evidencia del integrador está en texto, código y datos de prueba; las capturas se conservan fuera de la selección pública.
 
 ## Última verificación local: 21 de noviembre de 2026
 
