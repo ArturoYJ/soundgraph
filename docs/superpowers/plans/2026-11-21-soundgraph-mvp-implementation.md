@@ -42,7 +42,7 @@ Las casillas distinguen lo ejecutado del trabajo pendiente.
 ### H2 — Completar operaciones y preparar la entrega técnica
 
 - [x] Completar y probar vía API altas, cambios, borrados, reordenamiento de playlists y edición de notas por un perfil editor. Un orden inválido no deja cambios parciales y una edición no cambia la afinidad.
-- [ ] Conectar a la interfaz las acciones de administración y edición.
+- [x] Conectar a la interfaz las acciones de administración y edición. Ver [evidencia H2](../../evidence/2026-11-21-h2-frontend.md).
 - [ ] Documentar en `README.md` el arranque limpio y la parada de los servicios propios, y en `docs/api/` y `docs/models/` el contrato, el diccionario y las restricciones. Incorporar el catálogo de operaciones, matriz tecnológica y evidencias a los entregables de la guía.
 - [ ] Ejecutar pruebas unitarias/de componentes y repetir la integración con un proyecto nuevo. Medir descubrimiento con calentamiento explícito, tamaño de semilla, número de solicitudes y entorno. Registrar los resultados reales y no extrapolarlos a producción.
 

@@ -8,16 +8,21 @@ const paths = {
   session: "/demo/sessions/current",
   recommendations: "/recommendations",
   playlists: "/playlists",
+  songs: "/songs",
 };
-const links = { discover: "#/descubrir", playlists: "#/playlists" };
+const links = { discover: "#/descubrir", playlists: "#/playlists", editorial: "#/editorial" };
 const playlistPath = id => paths.playlists + "/" + encodeURIComponent(id);
 const playlistLink = id => "#/playlists/" + encodeURIComponent(id);
+const editorialPath = id => paths.songs + "/" + encodeURIComponent(id) + "/editorial";
+const trackPath = (playlistId, songId) => playlistPath(playlistId) + "/tracks/" + encodeURIComponent(songId);
 let profile = null;
 let routeRequest = 0;
 let sheetRequest = 0;
 let sheetFocus = null;
 let saving = false;
 let leaving = false;
+let sheetDismiss = null;
+let dirtyEditor = null;
 
 class RequestError extends Error {
   constructor(status, code) {
@@ -142,6 +147,7 @@ function showAccount(nextProfile) {
   profile = nextProfile;
   get("login").hidden = true;
   get("nav").hidden = false;
+  get("editor-link").hidden = profile.role !== "editor";
   get("account").hidden = false;
   get("profile-name").textContent = profile.displayName;
   get("avatar").textContent = profile.displayName.trim().slice(0, 1).toLocaleUpperCase("es");
@@ -212,6 +218,8 @@ get("logout").addEventListener("click", async () => {
 
 function route() {
   if (location.hash === links.playlists) return { page: "playlists" };
+  const editorial = /^#\/editorial(?:\?after=([A-Za-z0-9][A-Za-z0-9-]{0,63}))?$/.exec(location.hash);
+  if (editorial) return { page: "editorial", after: editorial[1] };
   const match = /^#\/playlists\/([A-Za-z0-9][A-Za-z0-9-]{0,63})$/.exec(location.hash);
   if (match) return { page: "detail", id: match[1] };
   return { page: "discover" };
@@ -223,26 +231,41 @@ async function renderRoute({ focus = false } = {}) {
   const current = route();
   const oldActive = document.activeElement;
   const discover = current.page === "discover";
-  ["discover-link", "lists-link"].forEach((id, index) => {
-    if (discover === (index === 0)) get(id).setAttribute("aria-current", "page");
+  const editorial = current.page === "editorial";
+  const back = current.page === "detail";
+  Object.entries({
+    "discover-link": discover,
+    "lists-link": back || current.page === "playlists",
+    "editor-link": editorial && profile.role === "editor",
+  }).forEach(([id, active]) => {
+    if (active) get(id).setAttribute("aria-current", "page");
     else get(id).removeAttribute("aria-current");
   });
   view.replaceChildren();
-  const back = current.page === "detail";
   if (back) view.append(link("← Volver a mis playlists", links.playlists, "quiet compact back"));
   const title = heading(
-    discover ? "Descubre música" : back ? "Playlist" : "Mis playlists",
-    discover ? "Recomendaciones basadas en escuchas compartidas." : null,
+    discover ? "Descubre música" : back ? "Playlist" : editorial ? "Catálogo editorial" : "Mis playlists",
+    discover ? "Recomendaciones basadas en escuchas compartidas." :
+      editorial && profile.role === "editor" ? "Elige una canción para consultar y actualizar sus notas." : null,
   );
   document.title = title.textContent + " · SoundGraph";
   if (focus || oldActive === document.body) title.focus();
-  const wait = loading(discover ? "Cargando recomendaciones…" : "Cargando playlists…", view, discover);
+  if (editorial && profile.role !== "editor") {
+    view.append(panel("Esta sección solo está disponible para el perfil Editor.",
+      actions(link("Ir a Descubrir", links.discover)), true));
+    return;
+  }
+  const wait = loading(discover ? "Cargando recomendaciones…" :
+    editorial ? "Cargando catálogo…" : "Cargando playlists…", view, discover);
   try {
-    const data = await api(discover ? paths.recommendations : back ? playlistPath(current.id) : paths.playlists);
+    const data = await api(discover ? paths.recommendations : back ? playlistPath(current.id) :
+      editorial ? paths.songs + (current.after ? "?after=" + encodeURIComponent(current.after) : "") :
+        paths.playlists);
     if (token !== routeRequest) return;
     wait.remove();
     if (discover) renderDiscover(data);
     else if (back) renderPlaylist(data, title);
+    else if (editorial) renderEditorial(data, current.after);
     else renderPlaylists(data);
   } catch (error) {
     if (token !== routeRequest) return;
@@ -252,7 +275,8 @@ async function renderRoute({ focus = false } = {}) {
     const other = link(discover ? "Ir a Mis playlists" : "Ir a Descubrir", discover ? links.playlists : links.discover, "quiet");
     if (back && error.code === "playlist_not_found") view.append(panel("No encontramos esa playlist.", null, true));
     else {
-      const copy = discover ? "No pudimos cargar las recomendaciones." : back ? "No pudimos cargar esta playlist." : "No pudimos cargar tus playlists.";
+      const copy = discover ? "No pudimos cargar las recomendaciones." : back ? "No pudimos cargar esta playlist." :
+        editorial ? editError(error, "No pudimos cargar el catálogo.") : "No pudimos cargar tus playlists.";
       view.append(panel(copy, actions(retry, other), true));
     }
   }
@@ -308,6 +332,9 @@ function renderDiscover({ items, partial }) {
 }
 
 function renderPlaylists({ items }) {
+  const tools = actions(button("Crear playlist", e => playlistNameSheet(e.currentTarget), "primary"));
+  tools.classList.add("page-actions");
+  view.append(tools);
   if (!items.length) {
     view.append(panel("Este perfil todavía no tiene playlists."));
     return;
@@ -325,10 +352,20 @@ function renderPlaylists({ items }) {
   view.append(list);
 }
 
-function renderPlaylist({ name, tracks, trackCount }, title) {
+function renderPlaylist(playlist, title) {
+  const { name, tracks, trackCount } = playlist;
   title.textContent = name;
   document.title = name + " · SoundGraph";
   title.after(el("p", countLabel(trackCount), "muted"));
+  const tools = actions(
+    button("Renombrar", e => playlistNameSheet(e.currentTarget, playlist)),
+    button("Eliminar playlist", e => deletePlaylistSheet(e.currentTarget, playlist), "danger-outline"),
+  );
+  if (tracks.length >= 2 && tracks.length <= 1000) {
+    tools.prepend(button("Reordenar pistas", e => reorderSheet(e.currentTarget, playlist), "primary"));
+  }
+  tools.classList.add("page-actions");
+  view.append(tools);
   if (!tracks.length) {
     view.append(panel("Aún no hay canciones guardadas.", actions(link("Ir a Descubrir", links.discover, "primary"))));
     return;
@@ -343,7 +380,10 @@ function renderPlaylist({ name, tracks, trackCount }, title) {
     text.append(el("strong", track.song?.title ?? "Ficha no disponible"));
     const name = track.song && artist(track.song);
     if (name) text.append(el("p", name, "secondary-text"));
-    li.append(number, text);
+    const remove = button("Quitar", e => removeTrackSheet(e.currentTarget, playlist, track), "quiet compact");
+    remove.classList.add("track-action");
+    remove.setAttribute("aria-label", "Quitar " + (track.song?.title ?? "pista sin ficha") + " de la playlist");
+    li.append(number, text, remove);
     list.append(li);
   }
   const next = link("Seguir descubriendo", links.discover);
@@ -367,6 +407,8 @@ function openSheet(kind, title, restore) {
 function closeSheet({ restore = true } = {}) {
   sheetRequest++;
   saving = false;
+  sheetDismiss = null;
+  dirtyEditor = null;
   const target = sheetFocus;
   sheetFocus = null;
   if (sheet.open) sheet.close();
@@ -376,7 +418,10 @@ function closeSheet({ restore = true } = {}) {
 
 sheet.addEventListener("cancel", event => {
   event.preventDefault();
-  if (!saving) closeSheet();
+  if (!saving) {
+    if (sheetDismiss) sheetDismiss();
+    else closeSheet();
+  }
 });
 
 function songSheet(rec, origin) {
@@ -450,7 +495,7 @@ async function saveSheet({ song, affinity }, origin, back = null) {
       save.textContent = "Guardando…";
       warning.hidden = go.hidden = true;
       try {
-        const result = await api(playlistPath(selected.playlistId) + "/tracks/" + encodeURIComponent(song.songId), { method: "PUT" });
+        const result = await api(trackPath(selected.playlistId, song.songId), { method: "PUT" });
         if (operation !== sheetRequest) return;
         closeSheet();
         notify((result.created ? "Guardada en " : "Ya estaba en ") + selected.name, result.created ? "success" : "neutral", target);
@@ -479,12 +524,343 @@ async function saveSheet({ song, affinity }, origin, back = null) {
   }
 }
 
+function editError(error, fallback) {
+  switch (error.code) {
+    case "editor_required": return "Solo el perfil Editor puede consultar y editar estas fichas.";
+    case "playlist_not_found": return "La playlist ya no está disponible.";
+    case "song_not_found": return "La ficha ya no está disponible.";
+    case "invalid_track_order": return "Las pistas cambiaron. Cierra este diálogo y vuelve a abrir la playlist antes de reordenar.";
+    case "invalid_input": return "Revisa los campos e inténtalo de nuevo.";
+    default: return fallback;
+  }
+}
+
+function managementForm(form, { label, pending, danger = false, cancel = () => closeSheet(), request, fallback, success }) {
+  const warning = notice("", true);
+  warning.hidden = true;
+  const cancelButton = button("Cancelar", cancel, "quiet");
+  const submit = el("button", label, "button " + (danger ? "danger" : "primary"));
+  submit.type = "submit";
+  form.append(warning, actions(cancelButton, submit));
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (saving) return;
+    warning.hidden = true;
+    let send;
+    try {
+      // Read and validate the form before disabling its controls.
+      send = request();
+    } catch (error) {
+      warning.textContent = error.message;
+      warning.hidden = false;
+      return;
+    }
+    const version = sheetRequest;
+    const enabled = [...form.elements].filter(control => !control.disabled);
+    saving = true;
+    for (const control of enabled) control.disabled = true;
+    submit.textContent = pending;
+    let result;
+    try {
+      result = await send();
+    } catch (error) {
+      if (version !== sheetRequest || expired(error)) return;
+      warning.textContent = editError(error, fallback);
+      warning.hidden = false;
+      return;
+    } finally {
+      if (version === sheetRequest) {
+        saving = false;
+        for (const control of enabled) control.disabled = false;
+        submit.textContent = label;
+        if (!warning.hidden) submit.focus();
+      }
+    }
+    if (version === sheetRequest) success(result);
+  });
+}
+
+function finishManagement(message, destination = null) {
+  closeSheet({ restore: false });
+  if (destination) history.pushState(null, "", destination);
+  notify(message, "success");
+  renderRoute({ focus: true });
+}
+
+function playlistNameSheet(origin, playlist = null) {
+  openSheet("management", playlist ? "Renombrar playlist" : "Crear playlist", origin);
+  const form = el("form");
+  const input = el("input");
+  input.id = "playlist-name";
+  input.type = "text";
+  input.required = true;
+  input.value = playlist?.name ?? "";
+  input.setAttribute("aria-describedby", "playlist-name-help");
+  const field = el("label", "Nombre");
+  field.htmlFor = input.id;
+  const help = el("p", "1 a 100 caracteres, sin contar espacios al inicio o al final.", "secondary-text");
+  help.id = "playlist-name-help";
+  form.append(field, input, help);
+  managementForm(form, {
+    label: playlist ? "Guardar cambios" : "Crear",
+    pending: playlist ? "Guardando…" : "Creando…",
+    fallback: playlist ? "No pudimos confirmar el cambio de nombre." :
+      "No pudimos confirmar la creación. Revisa Mis playlists antes de volver a intentarlo.",
+    request: () => {
+      const name = input.value.trim();
+      if (!name || [...name].length > 100) {
+        input.focus();
+        throw new Error("El nombre debe tener de 1 a 100 caracteres.");
+      }
+      return () => api(playlist ? playlistPath(playlist.playlistId) : paths.playlists,
+        { method: playlist ? "PATCH" : "POST", body: { name } });
+    },
+    success: result => finishManagement((playlist ? "Playlist renombrada: " : "Playlist creada: ") + result.name),
+  });
+  sheet.append(form);
+  input.focus();
+}
+
+function confirmRemoval(origin, title, description, path, outcome, destination = null) {
+  openSheet("management", title, origin);
+  sheet.append(el("p", description, "muted"));
+  const form = el("form");
+  managementForm(form, {
+    label: destination ? "Eliminar playlist" : "Quitar pista",
+    pending: destination ? "Eliminando…" : "Quitando…",
+    danger: true,
+    fallback: "No pudimos confirmar la operación. Comprueba el estado de la playlist.",
+    request: () => () => api(path, { method: "DELETE" }),
+    success: () => finishManagement(outcome, destination),
+  });
+  sheet.append(form);
+}
+
+function deletePlaylistSheet(origin, playlist) {
+  confirmRemoval(origin, "¿Eliminar esta playlist?",
+    "Eliminarás «" + playlist.name + "» y su lista de pistas. Las canciones seguirán en el catálogo.",
+    playlistPath(playlist.playlistId), "Playlist eliminada.", links.playlists);
+}
+
+function removeTrackSheet(origin, playlist, track) {
+  const name = track.song?.title ?? "la pista sin ficha";
+  confirmRemoval(origin, "¿Quitar esta pista?", "Se quitará «" + name + "» de «" + playlist.name + "».",
+    trackPath(playlist.playlistId, track.songId), "Pista retirada de la playlist.");
+}
+
+function reorderSheet(origin, playlist) {
+  openSheet("management", "Reordenar pistas", origin);
+  sheet.append(el("p", "Los cambios se aplican al guardar el orden.", "muted"));
+  const draft = [...playlist.tracks];
+  const form = el("form");
+  const list = el("ol", null, "tracks order-list");
+  const feedback = el("p", "", "secondary-text");
+  feedback.setAttribute("role", "status");
+
+  function draw(focusIndex, direction) {
+    list.replaceChildren();
+    draft.forEach((track, i) => {
+      const row = el("li", null, "track-row surface");
+      const title = track.song?.title ?? "Ficha no disponible";
+      const name = el("span", (i + 1) + ". " + title);
+      const controls = [-1, 1].map(step => {
+        const label = step < 0 ? "Subir" : "Bajar";
+        const move = button(label, () => {
+          [draft[i], draft[i + step]] = [draft[i + step], draft[i]];
+          feedback.textContent = title + " ahora está en la posición " + (i + step + 1) + ".";
+          draw(i + step, step);
+        }, "compact");
+        move.setAttribute("aria-label", label + " " + title);
+        move.disabled = i + step < 0 || i + step >= draft.length;
+        return move;
+      });
+      row.append(name, actions(...controls));
+      list.append(row);
+      if (i === focusIndex) {
+        const preferred = controls[direction < 0 ? 0 : 1];
+        (preferred.disabled ? controls.find(control => !control.disabled) : preferred)?.focus();
+      }
+    });
+  }
+
+  form.append(list, feedback);
+  draw();
+  managementForm(form, {
+    label: "Guardar orden",
+    pending: "Guardando…",
+    request: () => () => api(playlistPath(playlist.playlistId) + "/track-order",
+      { method: "PUT", body: { songIds: draft.map(track => track.songId) } }),
+    fallback: "No pudimos confirmar el nuevo orden. Tu borrador sigue abierto.",
+    success: () => finishManagement("Orden de las pistas actualizado."),
+  });
+  sheet.append(form);
+}
+
+function renderEditorial({ items, nextAfter }, after) {
+  if (!items.length) view.append(panel("No encontramos fichas en esta página."));
+  else {
+    const list = el("ul", null, "playlists");
+    for (const item of items) {
+      const row = el("li", null, "surface playlist-row");
+      const open = button("Editar notas", e => editorialSheet(e.currentTarget, item), "primary");
+      open.setAttribute("aria-label", "Editar notas de " + item.title);
+      row.append(el("h2", item.title), open);
+      list.append(row);
+    }
+    view.append(list);
+  }
+  const pagination = actions();
+  if (after) pagination.append(link("Volver al inicio del catálogo", links.editorial, "quiet"));
+  if (nextAfter) pagination.append(link("Siguiente página", links.editorial + "?after=" + encodeURIComponent(nextAfter)));
+  if (pagination.childElementCount) {
+    pagination.classList.add("page-actions", "follow");
+    view.append(pagination);
+  }
+}
+
+async function editorialSheet(origin, item) {
+  openSheet("editorial", "Editar notas", origin);
+  sheet.append(el("p", item.title, "muted"));
+  const wait = loading("Cargando ficha…", sheet);
+  const cancel = actions(button("Cancelar", () => closeSheet(), "quiet"));
+  sheet.append(cancel);
+  const version = sheetRequest;
+  let song;
+  try {
+    song = await api(editorialPath(item.songId));
+  } catch (error) {
+    if (version !== sheetRequest || expired(error)) return;
+    wait.replaceWith(notice(editError(error, "No pudimos cargar la ficha."), true));
+    cancel.append(button("Reintentar", () => editorialSheet(origin, item)));
+    return;
+  }
+  if (version !== sheetRequest) return;
+  wait.remove();
+  cancel.remove();
+  if (song.editorial.notes.length > 20) {
+    sheet.append(notice("Esta ficha supera el máximo de notas que permite editar la demo.", true),
+      actions(button("Cerrar", () => closeSheet(), "quiet")));
+    return;
+  }
+  const artistName = artist(song);
+  if (artistName) sheet.append(el("p", artistName, "secondary-text"));
+  const form = el("form");
+  const fields = el("div", null, "editorial-fields");
+  const editors = [];
+  let fieldSerial = 0;
+  const empty = song.editorial.notes.length === 0;
+  const original = JSON.stringify(song.editorial.notes.map(({ text, source }) => ({ text, source })));
+  const add = button("Añadir otra nota", () => appendNote({ text: "", source: "" }, true));
+  form.append(fields, actions(add));
+  const read = () => editors.map(({ text, source }) => ({ text: text.value, source: source.value }));
+  const isDirty = () => {
+    const notes = read();
+    return !(empty && notes.length === 1 && !notes[0].text && !notes[0].source) && JSON.stringify(notes) !== original;
+  };
+
+  function appendNote(note, focus = false) {
+    const id = ++fieldSerial;
+    const group = el("fieldset", null, "editorial-note");
+    const legend = el("legend", "Nota " + (editors.length + 1));
+    const text = el("textarea");
+    const source = el("input");
+    source.type = "text";
+    text.rows = 4;
+    text.id = "editorial-text-" + id;
+    source.id = "editorial-source-" + id;
+    text.required = source.required = true;
+    text.value = note.text;
+    source.value = note.source;
+    const textLabel = el("label", "Texto (1–1000 caracteres)");
+    const sourceLabel = el("label", "Fuente (1–200 caracteres)");
+    textLabel.htmlFor = text.id;
+    sourceLabel.htmlFor = source.id;
+    const entry = { text, source, legend };
+    group.append(legend, textLabel, text, sourceLabel, source);
+    if (focus) {
+      group.append(actions(button("Quitar nota nueva", () => {
+        editors.splice(editors.indexOf(entry), 1);
+        group.remove();
+        editors.forEach((editor, i) => { editor.legend.textContent = "Nota " + (i + 1); });
+        add.disabled = false;
+        add.focus();
+      }, "quiet compact")));
+    }
+    fields.append(group);
+    editors.push(entry);
+    add.disabled = editors.length >= 20;
+    if (focus) text.focus();
+  }
+
+  for (const note of empty ? [{ text: "", source: "" }] : song.editorial.notes) appendNote(note);
+  const discard = el("div", null, "discard-prompt");
+  discard.hidden = true;
+  discard.append(notice("Hay cambios sin guardar en esta ficha."));
+  let leave = () => closeSheet();
+  const stay = button("Seguir editando", () => {
+    discard.hidden = true;
+    form.hidden = false;
+    editors[0].text.focus();
+  }, "primary");
+  discard.append(actions(stay, button("Descartar cambios", () => leave(), "danger-outline")));
+
+  function tryLeave(onDiscard = () => closeSheet()) {
+    if (!isDirty()) return onDiscard();
+    leave = onDiscard;
+    form.hidden = true;
+    discard.hidden = false;
+    stay.focus();
+  }
+
+  dirtyEditor = { isDirty, tryLeave, hash: location.hash };
+  sheetDismiss = () => discard.hidden ? tryLeave() : stay.click();
+  managementForm(form, {
+    label: "Guardar nota",
+    pending: "Guardando…",
+    cancel: () => tryLeave(),
+    fallback: "No pudimos confirmar el guardado. Tus cambios siguen en el formulario.",
+    request: () => {
+      const notes = read().map(({ text, source }) => ({ text: text.trim(), source: source.trim() }));
+      const invalid = notes.findIndex(({ text, source }) => !text || [...text].length > 1000 ||
+        !source || [...source].length > 200);
+      if (invalid >= 0) {
+        const text = notes[invalid].text;
+        (!text || [...text].length > 1000 ? editors[invalid].text : editors[invalid].source).focus();
+        throw new Error("Revisa el texto o la fuente de la nota " + (invalid + 1) + ".");
+      }
+      return () => api(editorialPath(song.songId), { method: "PATCH", body: { notes } });
+    },
+    success: () => finishManagement("Notas guardadas en «" + song.title + "»."),
+  });
+  sheet.append(form, discard);
+}
+
 get("notification-link").addEventListener("click", resetNotification);
 document.querySelector(".skip").addEventListener("click", event => {
   event.preventDefault();
   get("main").focus();
 });
+window.addEventListener("beforeunload", event => {
+  if (dirtyEditor?.isDirty()) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
 window.addEventListener("hashchange", () => {
+  if (dirtyEditor?.isDirty() && location.hash !== dirtyEditor.hash) {
+    const destination = location.hash;
+    history.replaceState(null, "", "/" + dirtyEditor.hash);
+    dirtyEditor.tryLeave(() => {
+      closeSheet({ restore: false });
+      if (destination) location.hash = destination;
+      else {
+        history.replaceState(null, "", "/");
+        resetNotification();
+        renderRoute({ focus: true });
+      }
+    });
+    return;
+  }
   closeSheet({ restore: false });
   resetNotification();
   renderRoute({ focus: true });

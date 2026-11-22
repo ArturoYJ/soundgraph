@@ -1,7 +1,7 @@
 from neo4j import Query
 from pymongo import ReturnDocument
 
-from backend.schemas import Song
+from backend.schemas import Song, SongPage, SongSummary
 from scripts.storage import DATABASE_DIR
 
 RECOMMENDATIONS_QUERY = (DATABASE_DIR / "neo4j/queries/recommendations.cypher").read_text(encoding="utf-8")
@@ -27,6 +27,18 @@ class CatalogRepository:
 
     def exists(self, song_id):
         return self.songs.find_one({"_id": song_id}, {"_id": 1}) is not None
+
+    def list_songs(self, after, limit):
+        criteria = {"_id": {"$gt": after}} if after is not None else {}
+        documents = list(self.songs.find(criteria, {"title": 1}).sort("_id", 1).limit(limit + 1))
+        return SongPage(
+            items=[SongSummary(songId=doc["_id"], title=doc["title"]) for doc in documents[:limit]],
+            nextAfter=documents[limit - 1]["_id"] if len(documents) > limit else None,
+        )
+
+    def find_song(self, song_id):
+        document = self.songs.find_one({"_id": song_id})
+        return self.song(document) if document else None
 
     def replace_notes(self, song_id, notes):
         document = self.songs.find_one_and_update(

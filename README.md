@@ -11,6 +11,8 @@ SoundGraph es un proyecto académico que recomienda canciones a partir de escuch
 3. Abre una ficha y consulta sus créditos y notas disponibles.
 4. Guarda una canción en una playlist y vuelve a abrirla para comprobar su persistencia.
 
+En **Mis playlists** puedes crear, renombrar o eliminar una lista, quitar pistas y guardar un nuevo orden. El rol **Editor** dispone de la sección **Editorial** para elegir una ficha, editar sus notas y fuentes o añadir una nota.
+
 ## Arquitectura
 
 El proyecto utiliza una aplicación organizada por capas: el frontend se comunica por HTTP con una API FastAPI; los servicios coordinan operaciones y los repositorios acceden a los motores. El frontend y la API se sirven desde el mismo origen.
@@ -75,6 +77,7 @@ La [guía de la API](docs/api/README.md) tiene la prueba HTTP aislada, incluidos
 - [Índice de los ocho entregables](docs/entregables.md)
 - [Modelo integrado y diccionario de datos](docs/models/modelado-integrado.md)
 - [Arquitectura y selección tecnológica](docs/arquitectura.md)
+- [Qué usa cada base y cuándo intervienen los archivos del proyecto](docs/mapa-del-proyecto.md)
 - [Catálogo de operaciones y consultas](docs/catalogo-operaciones.md)
 - [Medición HTTP y resultados reproducibles](docs/evidence/2026-11-21-rendimiento.md)
 

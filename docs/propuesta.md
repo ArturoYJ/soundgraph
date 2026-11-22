@@ -10,8 +10,8 @@ El objetivo es demostrar un flujo funcional que coordine datos transaccionales, 
 
 | Usuario de la demo | Necesidad | Operaciones |
 | --- | --- | --- |
-| Oyente | Entender la recomendación y conservar una canción | Entrar, descubrir, ver la ficha, guardar y volver a abrir la playlist. La API también permite crear, renombrar, eliminar y reordenar playlists y quitar pistas. |
-| Editor | Corregir o actualizar el contexto de una canción | Reemplazar las notas editoriales y sus fuentes mediante la API, sin cambiar las escuchas ni las playlists. |
+| Oyente | Entender la recomendación y conservar una canción | Entrar, descubrir, ver la ficha, guardar y volver a abrir la playlist. Desde Mis playlists puede crear, renombrar, eliminar, reordenar y quitar pistas. |
+| Editor | Corregir o actualizar el contexto de una canción | Reemplazar las notas editoriales y sus fuentes desde Editorial, sin cambiar las escuchas ni las playlists. |
 
 El prototipo no reproduce audio, no recopila escuchas de usuarios reales ni ofrece registro público. Los perfiles e historiales se precargan para una demostración académica reproducible.
 

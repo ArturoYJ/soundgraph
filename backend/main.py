@@ -16,7 +16,7 @@ from backend.repositories.music import CatalogRepository, GraphRepository
 from backend.repositories.sql import SqlRepository
 from backend.schemas import (
     ID_PATTERN, ErrorBody, Health, Login, NoteUpdate, Playlist, PlaylistDetail,
-    PlaylistInput, Playlists, Profile, Recommendations, SavedTrack, Song, TrackOrder,
+    PlaylistInput, Playlists, Profile, Recommendations, SavedTrack, Song, SongPage, TrackOrder,
 )
 from backend.services import discovery, sessions
 from scripts.storage import DATABASE_ERRORS, connect_postgres, create_graph_driver, create_mongo_client
@@ -111,6 +111,14 @@ def authenticated(cookie: SessionCookie, sql: SQL):
 
 
 User = Annotated[Profile, Depends(authenticated)]
+
+
+def require_editor(profile: User):
+    if profile.role != "editor":
+        raise ApiError(403, "editor_required", "No tienes permiso para acceder a la edición de fichas.")
+
+
+EditorAccess = Annotated[None, Depends(require_editor)]
 error_codes = {
     401: {"model": ErrorBody, "description": "Sesión o credenciales no válidas"},
     403: {"model": ErrorBody, "description": "Permiso u origen no permitido"},
@@ -219,11 +227,27 @@ def remove_track(playlistId: ResourceId, songId: ResourceId, profile: User, sql:
     return Response(status_code=204)
 
 
+@api.get("/songs", response_model=SongPage, tags=["Editorial"], responses=documented(401, 403, 422, 503))
+def editorial_catalog(
+    _editor: EditorAccess, catalog: Catalog,
+    after: Annotated[str | None, Query(pattern=ID_PATTERN)] = None,
+    limit: Annotated[int, Query(ge=1, le=50)] = 20,
+):
+    return catalog.list_songs(after, limit)
+
+
+@api.get("/songs/{songId}/editorial", response_model=Song, tags=["Editorial"],
+         responses=documented(401, 403, 404, 422, 503))
+def editorial_detail(songId: ResourceId, _editor: EditorAccess, catalog: Catalog):
+    song = catalog.find_song(songId)
+    if not song:
+        raise missing_song()
+    return song
+
+
 @api.patch("/songs/{songId}/editorial", response_model=Song, tags=["Editorial"],
            responses=documented(401, 403, 404, 422, 503))
-def edit_editorial(songId: ResourceId, payload: NoteUpdate, profile: User, catalog: Catalog):
-    if profile.role != "editor":
-        raise ApiError(403, "editor_required", "No tienes permiso para editar esta ficha.")
+def edit_editorial(songId: ResourceId, payload: NoteUpdate, _editor: EditorAccess, catalog: Catalog):
     song = catalog.replace_notes(songId, payload.notes)
     if not song:
         raise missing_song()
