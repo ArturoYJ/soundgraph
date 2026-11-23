@@ -156,7 +156,10 @@ class ApiTests(unittest.TestCase):
         editor = self.login("p-editor", "DEMO_CODE_EDITOR")
         route = BASE + "/songs/c-cream/editorial"
         original = listener.send("GET", BASE + "/recommendations")[1]["items"][0]
-        data = {"notes": [{"text": "Nota de la prueba HTTP", "source": "Prueba aislada"}]}
+        data = {"notes": [
+            {"text": "Nota de la prueba HTTP", "source": "Prueba aislada"},
+            *original["song"]["editorial"]["notes"],
+        ]}
         self.assertEqual(listener.send("PATCH", route, data)[0], 403)
         self.assertEqual(editor.send("PATCH", route, {"notes": [{"text": "", "source": "x"}]})[0], 422)
         try:
@@ -165,8 +168,37 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(updated["affinity"], original["affinity"])
             self.assertEqual(updated["song"]["editorial"]["credits"], original["song"]["editorial"]["credits"])
             self.assertEqual(updated["song"]["editorial"]["notes"], data["notes"])
+            self.assertEqual(editor.send("GET", route)[1]["editorial"]["notes"], data["notes"])
         finally:
-            editor.send("PATCH", route, {"notes": original["song"]["editorial"]["notes"]})
+            self.assertEqual(editor.send("PATCH", route, {"notes": original["song"]["editorial"]["notes"]})[0], 200)
+
+    def test_08_editorial_catalog_reads_and_permissions(self):
+        list_route = BASE + "/songs"
+        detail = BASE + "/songs/c-cream/editorial"
+        guest = Client()
+        listener = self.login()
+        editor = self.login("p-editor", "DEMO_CODE_EDITOR")
+        for path in (list_route, detail):
+            self.assertEqual(guest.send("GET", path)[0], 401)
+            status, data, _ = listener.send("GET", path)
+            self.assertEqual((status, data["code"]), (403, "editor_required"))
+        status, page, _ = editor.send("GET", list_route + "?limit=1")
+        self.assertEqual(status, 200)
+        self.assertEqual(len(page["items"]), 1)
+        self.assertEqual(set(page["items"][0]), {"songId", "title"})
+        self.assertEqual(page["nextAfter"], page["items"][0]["songId"])
+        status, tail, _ = editor.send("GET", list_route + "?after=" + page["nextAfter"])
+        self.assertEqual(status, 200)
+        self.assertIsNone(tail["nextAfter"])
+        self.assertEqual(sorted(x["songId"] for x in page["items"] + tail["items"]),
+                         ["c-allBlues", "c-cream", "c-soWhat"])
+        self.assertEqual(editor.send("GET", list_route + "?limit=51")[0], 422)
+        status, song, _ = editor.send("GET", detail)
+        self.assertEqual(status, 200)
+        self.assertEqual(song["title"], "C.R.E.A.M.")
+        self.assertTrue(song["editorial"]["notes"])
+        status, body, _ = editor.send("GET", BASE + "/songs/no-existe/editorial")
+        self.assertEqual((status, body["code"]), (404, "song_not_found"))
 
     def test_06_partial_recommendation_and_orphan_playlist(self):
         client = self.login()
