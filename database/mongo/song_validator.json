@@ -32,8 +32,8 @@
               "required": ["text", "source"],
               "additionalProperties": false,
               "properties": {
-                "text": {"bsonType": "string", "minLength": 1, "maxLength": 1000},
-                "source": {"bsonType": "string", "minLength": 1, "maxLength": 200}
+                "text": {"bsonType": "string", "minLength": 1, "maxLength": 1000, "pattern": "\\S"},
+                "source": {"bsonType": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S"}
               }
             }
           }
