@@ -2,6 +2,8 @@
 
 **Alcance:** operaciones de la versión actual. Los cuerpos completos y tipos se encuentran en [OpenAPI](api/openapi.json). Las rutas de negocio llevan el prefijo `/api/v1`; las protegidas requieren una sesión de demo. **PG** = PostgreSQL, **MG** = MongoDB, **NG** = Neo4j. Las respuestas de error tienen código y mensaje; un estado que aparece en «límites y errores» no se considera probado salvo que la columna de evidencia lo indique.
 
+**Cómo leer la evidencia:** las referencias H01–H08 identifican casos ejecutados de la suite HTTP; los recorridos de navegador y las mediciones se citan cuando corresponden. Las expresiones «previsto», «implementado» o «no se verificó» describen el contrato o el código, no una prueba aprobada de ese caso. Los resultados por ejecución y revisión se separan en el [índice de entregables](entregables.md#cómo-leer-las-evidencias).
+
 ## Operaciones de la aplicación
 
 | ID · propósito | Ruta · motores | Entrada y validación | Salida esperada | Límites, errores y evidencia observada |
@@ -32,7 +34,7 @@ Se ejecutaron en el entorno aislado `soundgraph-bench` con la semilla sin pistas
 | ID · consulta | Parámetros y resultado esperado | Resultado observado y caso negativo |
 | --- | --- | --- |
 | Q-SQL · listar playlists y contar pistas con `LEFT JOIN` | En el [repositorio SQL](../backend/repositories/sql.py), `list_playlists(owner)`, propietario `p-ana-main`; una fila `(playlist_id, name, count)`. | `(pl-ana-demo, Para escuchar, 0)`. Como prueba de integridad distinta de esta lectura, PostgreSQL rechazó un propietario inexistente al insertar una playlist. |
-| Q-DOC · proyectar ficha y notas con `find` y filtro por `_id` | `{"_id":{"$in":["c-cream"]}}`, proyección `{"title":1, "editorial.notes":1}`; una ficha coincidente. Véase [by_ids en el repositorio](../backend/repositories/music.py). | Una ficha con ID `c-cream`, título «C.R.E.A.M.» y una nota. La prueba de integridad separada registró código 121 al insertar una ficha sin sección editorial. |
+| Q-DOC · proyectar ficha y notas con `find` y filtro por `_id` | Consulta representativa de prueba: `{"_id":{"$in":["c-cream"]}}`, proyección `{"title":1, "editorial.notes":1}`; una ficha coincidente. La API usa por separado [by_ids](../backend/repositories/music.py), que consulta por `$in` sin esa proyección. | Una ficha con ID `c-cream`, título «C.R.E.A.M.» y una nota. La prueba de integridad separada registró código 121 al insertar una ficha sin sección editorial. |
 | Q-GRAFO · contar perfiles afines, no caminos | [Cypher parametrizado](../database/neo4j/queries/recommendations.cypher): `profile_id=p-ana-main`, `limit=10`; filas `(song_id, affinity)`. | `(c-cream, 1)`. La prueba de la consulta con el perfil nuevo devuelve vacío. La auditoría verificó detección de referencias huérfanas con datos de prueba. |
 
 Las pruebas de los motores y de consistencia están en la [suite de integración](../tests/integration/) y la [evidencia de carga](evidence/2026-11-21-h0-data-seed.md). Las referencias y las reglas se explican en el [modelo integrado](models/modelado-integrado.md).

@@ -22,6 +22,35 @@ La ficha es la representación documental de la canción, no una entidad física
 
 ## Relacional — PostgreSQL
 
+El siguiente diagrama muestra las relaciones físicas dentro de PostgreSQL. La referencia de `song_id` a la ficha de MongoDB se explica debajo de la tabla: no es una clave foránea SQL.
+
+```mermaid
+erDiagram
+    PROFILES ||--o{ PLAYLISTS : posee
+    PROFILES ||--o{ DEMO_SESSIONS : abre
+    PLAYLISTS ||--o{ PLAYLIST_TRACKS : contiene
+    PROFILES {
+        text profile_id PK
+        text display_name
+        text role
+    }
+    PLAYLISTS {
+        text playlist_id PK
+        text owner_id FK
+        text name
+    }
+    PLAYLIST_TRACKS {
+        text playlist_id PK,FK
+        text song_id PK
+        integer position
+    }
+    DEMO_SESSIONS {
+        text token_hash PK
+        text profile_id FK
+        timestamptz expires_at
+    }
+```
+
 Identificadores de perfil, playlist y canción: texto de 1–64 caracteres; empiezan por letra ASCII o dígito y admiten guiones tras el primer carácter. Todos los campos de esta tabla de diccionario son obligatorios.
 
 | Tabla | Campo | Tipo y reglas |
@@ -43,6 +72,18 @@ Identificadores de perfil, playlist y canción: texto de 1–64 caracteres; empi
 
 ## Documental — MongoDB
 
+La estructura siguiente muestra una ficha; `credits` y `notes` son secciones opcionales por separado, pero al menos una debe existir y cada arreglo presente debe contener elementos.
+
+```text
+songs (colección)
+└── documento de canción
+    ├── _id: identificador de canción
+    ├── title: título
+    └── editorial
+        ├── credits[]: { name, role }
+        └── notes[]:   { text, source }
+```
+
 Colección `soundgraph.songs`; validación `strict`, acción `error`. Se rechazan campos fuera de los admitidos por el validador. El índice único de `_id` es suficiente para la búsqueda por canción y la hidratación en bloque con `$in`; no se añadió un índice para notas o créditos porque no se filtra por ellos.
 
 | Ruta | Tipo y reglas |
@@ -51,11 +92,18 @@ Colección `soundgraph.songs`; validación `strict`, acción `error`. Se rechaza
 | `title` | Cadena obligatoria, 1–160 caracteres y al menos un carácter que no sea espacio en blanco. |
 | `editorial` | Objeto obligatorio con al menos una sección admitida: `credits` o `notes`. |
 | `editorial.credits[]` | Si existe, arreglo no vacío de objetos con `name` (cadena 1–160) y `role` (1–100). |
-| `editorial.notes[]` | Si existe, arreglo no vacío de objetos con `text` (cadena 1–1000) y `source` (1–200). |
+| `editorial.notes[]` | Si existe, arreglo no vacío de objetos con `text` (cadena 1–1000) y `source` (1–200); ambos deben contener al menos un carácter que no sea espacio en blanco. |
 
 Los límites de entrada de la **API** son independientes del validador de almacenamiento: la edición requiere entre 1 y 20 notas y recorta sus textos y fuentes antes de validar. Cambia únicamente la sección de notas.
 
 ## Grafo — Neo4j
+
+```mermaid
+flowchart LR
+    P["Perfil<br/>profileId"] -->|"ESCUCHÓ"| C["Cancion<br/>songId"]
+```
+
+La flecha indica la dirección de la relación. Las propiedades enlazan lógicamente con los datos oficiales de PostgreSQL y MongoDB; el diagrama no afirma que Neo4j haga cumplir esas referencias entre motores.
 
 | Elemento | Propiedades, dirección y cardinalidad |
 | --- | --- |

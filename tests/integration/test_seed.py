@@ -63,6 +63,26 @@ def test_mongo_rejects_invalid_document(stores):
     assert error.value.code == 121
 
 
+@pytest.mark.parametrize("field", ["text", "source"])
+def test_mongo_rejects_whitespace_only_note(stores, field):
+    note = {"text": "Nota válida", "source": "Fuente válida"}
+    note[field] = "   "
+    doc = {"_id": "c-invalid-spaces", "title": "Canción", "editorial": {"notes": [note]}}
+    with pytest.raises(WriteError) as error:
+        stores.mongo.songs.insert_one(doc)
+    assert error.value.code == 121
+
+
+def test_mongo_accepts_valid_note(stores):
+    doc = {"_id": "c-valid-note-test", "title": "Canción",
+           "editorial": {"notes": [{"text": "Nota válida", "source": "Fuente válida"}]}}
+    try:
+        stores.mongo.songs.insert_one(doc)
+        assert stores.mongo.songs.find_one({"_id": doc["_id"]}) == doc
+    finally:
+        stores.mongo.songs.delete_one({"_id": doc["_id"]})
+
+
 def test_postgres_rejects_inexistent_owner(stores):
     with pytest.raises(psycopg.errors.ForeignKeyViolation):
         stores.postgres.execute(

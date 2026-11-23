@@ -12,10 +12,20 @@ Sigue el [arranque local](../README.md#arranque-local), abre [SoundGraph](http:/
 
 La primera vez solo se mostrará **Guardada** si la pista aún no estaba en la lista. Si el entorno ya se usó para ensayar, emplea una playlist temporal para demostrar el alta sin alterar una lista existente.
 
+## Preparación previa de gestión
+
+Antes de presentar, entra como Ana y crea una playlist temporal en **Mis playlists**. Desde **Descubrir**, guarda «C.R.E.A.M.» en ella. Para añadir la segunda canción de la semilla:
+
+1. Abre [Swagger](http://127.0.0.1:8000/docs) en el mismo navegador y origen, con la sesión de Ana activa.
+2. Ejecuta `GET /api/v1/playlists` e identifica el `playlistId` de la lista temporal.
+3. Ejecuta `PUT /api/v1/playlists/{playlistId}/tracks/{songId}` con ese identificador y `songId: c-soWhat`.
+4. Vuelve a la lista y comprueba que aparecen ambas pistas. Conserva otra lista vacía para mostrar un primer guardado.
+
+La preparación usa datos de prueba y deja las pistas disponibles antes de la exposición; no es necesario usar Swagger durante el recorrido en vivo.
+
 ## Recorrido de gestión y edición
 
-- **Preparación antes de presentar:** crea una playlist de ensayo y añade dos canciones del catálogo mediante Swagger como se indica abajo. Comprueba el orden antes de comenzar; así puedes demostrar el reordenamiento sin depender de Swagger durante la exposición. Conserva otra playlist vacía para mostrar un primer guardado.
-- **Playlists, como Ana:** en **Mis playlists**, crea una lista temporal y renómbrala. Guarda «C.R.E.A.M.» desde **Descubrir** en esa lista. Para mostrar **Reordenar pistas**, abre [Swagger](http://127.0.0.1:8000/docs) en el mismo navegador y origen, identifica la lista temporal con `GET /api/v1/playlists` y agrega `c-soWhat` con `PUT /api/v1/playlists/{playlistId}/tracks/{songId}`. Regresa a la lista, mueve una pista con **Subir/Bajar**, guarda y recarga. Quita una pista y elimina solo la playlist de ensayo; las canciones del catálogo no se borran.
+- **Playlists, como Ana:** abre la playlist preparada, renómbrala y selecciona **Reordenar pistas**. Mueve una pista con **Subir/Bajar**, guarda y recarga. Quita una pista y, al terminar, elimina solo la playlist de ensayo; las canciones del catálogo no se borran.
 - **Notas, como Editor:** cierra la sesión de Ana, entra como **Editor** con `DEMO_CODE_EDITOR`, abre **Editorial** y elige una ficha. Guarda un cambio en el texto o la fuente de una nota, recarga y vuelve a abrirla para verificar el resultado. Para una demostración con escritura editorial, usa datos de prueba o restaura la nota inicial al terminar. Los créditos y el título no se editan desde este formulario.
 
 [Índice de entregables](entregables.md) · [Evidencia del recorrido principal](evidence/2026-11-21-h1-frontend.md) · [Evidencia de gestión y edición](evidence/2026-11-21-h2-frontend.md)
