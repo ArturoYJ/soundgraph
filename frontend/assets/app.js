@@ -529,13 +529,13 @@ function editError(error, fallback) {
     case "editor_required": return "Solo el perfil Editor puede consultar y editar estas fichas.";
     case "playlist_not_found": return "La playlist ya no está disponible.";
     case "song_not_found": return "La ficha ya no está disponible.";
-    case "invalid_track_order": return "Las pistas cambiaron. Cierra este diálogo y vuelve a abrir la playlist antes de reordenar.";
+    case "invalid_track_order": return "Las pistas cambiaron. Recarga la playlist antes de reordenar.";
     case "invalid_input": return "Revisa los campos e inténtalo de nuevo.";
     default: return fallback;
   }
 }
 
-function managementForm(form, { label, pending, danger = false, cancel = () => closeSheet(), request, fallback, success }) {
+function managementForm(form, { label, pending, danger = false, cancel = () => closeSheet(), request, fallback, success, onConflict }) {
   const warning = notice("", true);
   warning.hidden = true;
   const cancelButton = button("Cancelar", cancel, "quiet");
@@ -567,6 +567,9 @@ function managementForm(form, { label, pending, danger = false, cancel = () => c
       if (version !== sheetRequest || expired(error)) return;
       warning.textContent = editError(error, fallback);
       warning.hidden = false;
+      if (error.code === "invalid_track_order" && onConflict) {
+        warning.append(" ", button("Recargar playlist", onConflict, "quiet compact"));
+      }
       return;
     } finally {
       if (version === sheetRequest) {
@@ -691,6 +694,7 @@ function reorderSheet(origin, playlist) {
     request: () => () => api(playlistPath(playlist.playlistId) + "/track-order",
       { method: "PUT", body: { songIds: draft.map(track => track.songId) } }),
     fallback: "No pudimos confirmar el nuevo orden. Tu borrador sigue abierto.",
+    onConflict: () => { closeSheet({ restore: false }); renderRoute({ focus: true }); },
     success: () => finishManagement("Orden de las pistas actualizado."),
   });
   sheet.append(form);

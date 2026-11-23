@@ -14,6 +14,7 @@ La primera vez solo se mostrará **Guardada** si la pista aún no estaba en la l
 
 ## Recorrido de gestión y edición
 
+- **Preparación antes de presentar:** crea una playlist de ensayo y añade dos canciones del catálogo mediante Swagger como se indica abajo. Comprueba el orden antes de comenzar; así puedes demostrar el reordenamiento sin depender de Swagger durante la exposición. Conserva otra playlist vacía para mostrar un primer guardado.
 - **Playlists, como Ana:** en **Mis playlists**, crea una lista temporal y renómbrala. Guarda «C.R.E.A.M.» desde **Descubrir** en esa lista. Para mostrar **Reordenar pistas**, abre [Swagger](http://127.0.0.1:8000/docs) en el mismo navegador y origen, identifica la lista temporal con `GET /api/v1/playlists` y agrega `c-soWhat` con `PUT /api/v1/playlists/{playlistId}/tracks/{songId}`. Regresa a la lista, mueve una pista con **Subir/Bajar**, guarda y recarga. Quita una pista y elimina solo la playlist de ensayo; las canciones del catálogo no se borran.
 - **Notas, como Editor:** cierra la sesión de Ana, entra como **Editor** con `DEMO_CODE_EDITOR`, abre **Editorial** y elige una ficha. Guarda un cambio en el texto o la fuente de una nota, recarga y vuelve a abrirla para verificar el resultado. Para una demostración con escritura editorial, usa datos de prueba o restaura la nota inicial al terminar. Los créditos y el título no se editan desde este formulario.
 
