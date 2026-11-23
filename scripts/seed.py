@@ -34,16 +34,17 @@ def load_fixture():
 
 
 def seed(stores, data):
+    sql_seed = DATABASE_DIR / "postgres/seed"
     with stores.postgres.transaction():
         for migration in sorted((DATABASE_DIR / "postgres").glob("[0-9]*_*.sql")):
             stores.postgres.execute(migration.read_text(encoding="utf-8"))
         with stores.postgres.cursor() as cursor:
             cursor.executemany(
-                "INSERT INTO profiles VALUES (%s, %s, %s) ON CONFLICT (profile_id) DO NOTHING",
+                (sql_seed / "profiles.sql").read_text(encoding="utf-8"),
                 [(row["id"], row["name"], row["role"]) for row in data["profiles"]],
             )
             cursor.executemany(
-                "INSERT INTO playlists VALUES (%s, %s, %s) ON CONFLICT (playlist_id) DO NOTHING",
+                (sql_seed / "playlists.sql").read_text(encoding="utf-8"),
                 [(row["id"], row["ownerId"], row["name"]) for row in data["playlists"]],
             )
 
@@ -64,20 +65,17 @@ def seed(stores, data):
         if command.strip():
             stores.graph.execute_query(command.strip(), database_="neo4j")
     stores.graph.execute_query("CALL db.awaitIndexes(30)", database_="neo4j")
+    graph_seed = DATABASE_DIR / "neo4j/seed"
     stores.graph.execute_query(
-        "UNWIND $ids AS id MERGE (:Perfil {profileId: id})",
+        (graph_seed / "profiles.cypher").read_text(encoding="utf-8"),
         ids=[row["id"] for row in data["profiles"]], database_="neo4j",
     )
     stores.graph.execute_query(
-        "UNWIND $ids AS id MERGE (:Cancion {songId: id})",
+        (graph_seed / "songs.cypher").read_text(encoding="utf-8"),
         ids=[doc["_id"] for doc in data["songs"]], database_="neo4j",
     )
     stores.graph.execute_query(
-        """
-        UNWIND $rows AS row
-        MATCH (p:Perfil {profileId: row.profileId}), (s:Cancion {songId: row.songId})
-        MERGE (p)-[:`ESCUCHÓ`]->(s)
-        """,
+        (graph_seed / "listens.cypher").read_text(encoding="utf-8"),
         rows=data["listens"], database_="neo4j",
     )
 

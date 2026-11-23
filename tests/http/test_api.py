@@ -3,6 +3,7 @@
 import http.cookiejar
 import json
 import subprocess
+import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -231,7 +232,18 @@ class ApiTests(unittest.TestCase):
         finally:
             subprocess.run((*SQL_COMPOSE, "up", "-d", "--wait", "--wait-timeout", "100", "neo4j"),
                            cwd=ROOT, check=True, capture_output=True)
-        self.assertEqual(client.send("GET", BASE + "/recommendations")[1]["items"][0]["song"]["songId"], "c-cream")
+        deadline = time.monotonic() + 60
+        while True:
+            status, body, _ = client.send("GET", "/health/ready")
+            if status == 200 and body == {"status": "ok"}:
+                break
+            self.assertEqual(status, 503, (status, body))
+            if time.monotonic() >= deadline:
+                self.fail(f"La API no recuperó disponibilidad en 60 s: {status}, {body}")
+            time.sleep(1)
+        status, body, _ = client.send("GET", BASE + "/recommendations")
+        self.assertEqual(status, 200, body)
+        self.assertEqual(body["items"][0]["song"]["songId"], "c-cream")
 
 
 if __name__ == "__main__":
