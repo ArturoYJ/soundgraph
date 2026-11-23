@@ -112,6 +112,7 @@ Base `/api/v1`. Consumir JSON desde el mismo origen mediante cookie de sesión; 
 | Guardar | `PUT /playlists/{playlistId}/tracks/{songId}`, sin cuerpo; devuelve `{playlistId, songId, position, created}` |
 | Crear, renombrar y eliminar | `POST /playlists` con `{name}`; `PATCH /playlists/{playlistId}` con `{name}`; `DELETE /playlists/{playlistId}` |
 | Quitar pista y reordenar | `DELETE /playlists/{playlistId}/tracks/{songId}`; `PUT /playlists/{playlistId}/track-order` con `{songIds:[...]}` |
+| Abrir catálogo y ficha editorial (solo Editor) | `GET /songs` y `GET /songs/{songId}/editorial` |
 | Editar notas | `PATCH /songs/{songId}/editorial` con `{notes:[{text,source}]}` |
 
 **Orden en Stitch:** enlaza primero el recorrido que cierra con la pista guardada; duplica Descubrir en variantes cargando, vacío, parcial y fallido; diseña móvil; por último agrega los formularios H2. Incluye los nombres de pantallas y estados en la entrega. El prototipo no es evidencia de integración hasta conectarse y probarse contra la API.

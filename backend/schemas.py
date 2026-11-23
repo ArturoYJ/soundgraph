@@ -51,6 +51,16 @@ class Song(BaseModel):
     editorial: Editorial
 
 
+class SongSummary(BaseModel):
+    songId: Identifier
+    title: str
+
+
+class SongPage(BaseModel):
+    items: list[SongSummary]
+    nextAfter: Identifier | None = None
+
+
 class Recommendation(BaseModel):
     song: Song
     affinity: int = Field(ge=1)

@@ -25,11 +25,13 @@ Mismo origen; cookie opaca temporal, `HttpOnly`, `SameSite=Strict` y revocada en
 | `POST /playlists`, `PATCH /playlists/{playlistId}`, `DELETE /playlists/{playlistId}` | `{name}` para crear `201` o renombrar `200`; eliminar `204`. |
 | `PUT /playlists/{playlistId}/tracks/{songId}`, `DELETE /playlists/{playlistId}/tracks/{songId}` | Guardar sin cuerpo → `{playlistId,songId,position,created}`, `201/200`; quitar `204`. |
 | `PUT /playlists/{playlistId}/track-order` | `{songIds:[...]}` con la permutación exacta de las pistas presentes → `204`. |
+| `GET /songs` | Solo editor: `200 {items:[{songId,title}], nextAfter}`. Orden por identificador, cursor `after`, límite 1–50 (20 predeterminado). |
+| `GET /songs/{songId}/editorial` | Solo editor: `200` con ficha real o `404 song_not_found`. |
 | `PATCH /songs/{songId}/editorial` | `{notes:[{text,source}]}` → ficha actualizada, solo rol editorial. Sustituye la sección de notas, sin modificar créditos o título. |
 
 Los errores gestionados usan `{code,message}` y, para validación de campos, pueden añadir `fields`. Códigos útiles: `invalid_credentials`, `session_required`, `invalid_origin`, `editor_required`, `playlist_not_found`, `song_not_found`, `invalid_input`, `invalid_track_order`, `service_unavailable`.
 
-**Consistencia:** PostgreSQL verifica la sesión y posee las playlists; Neo4j devuelve candidatos; MongoDB hidrata fichas en bloque. Se omiten recomendaciones con ficha ausente y se marca `partial: true`. Guardar valida un identificador existente y escribe en una sola transacción SQL. El bloqueo de la fila de playlist serializa operaciones concurrentes sobre sus pistas; las altas repetidas no cambian la posición. La edición de notas escribe únicamente en MongoDB.
+**Consistencia:** PostgreSQL verifica la sesión y posee las playlists; Neo4j devuelve candidatos; MongoDB hidrata fichas en bloque. Se omiten recomendaciones con ficha ausente y se marca `partial: true`. Guardar valida un identificador existente y escribe en una sola transacción SQL. El bloqueo de la fila de playlist serializa operaciones concurrentes sobre sus pistas; las altas repetidas no cambian la posición. La edición de notas escribe únicamente en MongoDB. El formulario carga la ficha al abrirse y envía la sección completa de notas; si dos editores guardan sobre una misma ficha, prevalece la última escritura, sin control de versiones.
 
 ## Prueba HTTP aislada
 

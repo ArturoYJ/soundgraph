@@ -120,3 +120,23 @@ input:not([type=radio]), select { width: 100%; min-height: 48px; padding: .55rem
   .song-inner .monogram { grid-column: 1; grid-row: 1 / span 3; }
   .song-inner > :not(.monogram) { grid-column: 2; }
 }
+
+/* H2 keeps the same editorial palette and native sheet behavior. */
+.page-actions { margin: 0 0 1.15rem; }
+.page-actions.follow { margin: 1.15rem 0 0; }
+.button.danger, .button.danger-outline { border-color: #a75760; color: #762b3a; }
+.button.danger { background: #762b3a; color: white; }
+.button.danger:hover { background: #622231; }
+.button.danger-outline:hover { background: #f3e0e5; }
+.track-row .track-action { margin-inline-start: auto; flex-shrink: 0; }
+.sheet .order-list .track-row { justify-content: space-between; flex-wrap: wrap; gap: .35rem .7rem; }
+.sheet .editorial-fields { display: grid; gap: .75rem; }
+.sheet fieldset.editorial-note { display: grid; gap: .35rem; border: 1px solid var(--line); border-radius: .5rem; padding: .7rem; }
+.editorial-note legend { padding: 0 .3rem; font-weight: 680; }
+.editorial-note label { color: var(--muted); font-size: .85rem; }
+.editorial-note textarea {
+  width: 100%; min-height: 5.8rem; padding: .6rem .8rem; resize: vertical;
+  border: 1px solid #9e8b97; border-radius: .36rem; font: inherit; color: var(--ink); background: var(--surface);
+}
+.discard-prompt { margin-top: 1rem; display: grid; gap: .7rem; }
+@media (max-width: 380px) { nav { gap: .8rem; } }

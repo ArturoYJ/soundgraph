@@ -11,6 +11,8 @@ SoundGraph es un proyecto académico que recomienda canciones a partir de escuch
 3. Abre una ficha y consulta sus créditos y notas disponibles.
 4. Guarda una canción en una playlist y vuelve a abrirla para comprobar su persistencia.
 
+En **Mis playlists** puedes crear, renombrar o eliminar una lista, quitar pistas y guardar un nuevo orden. El rol **Editor** dispone de la sección **Editorial** para elegir una ficha, editar sus notas y fuentes o añadir una nota.
+
 ## Arquitectura
 
 El proyecto utiliza una aplicación organizada por capas: el frontend se comunica por HTTP con una API FastAPI; los servicios coordinan operaciones y los repositorios acceden a los motores. El frontend y la API se sirven desde el mismo origen.
@@ -31,9 +33,9 @@ flowchart LR
 | `frontend/` | Interfaz y recursos web |
 | `backend/` | API, servicios y repositorios |
 | `database/` | Esquemas, consultas y datos de demostración |
-| `scripts/` | Inicialización y auditoría de referencias |
-| `tests/` | Pruebas HTTP y de integración |
-| `docs/` | Diseño, contrato de API y evidencias |
+| `scripts/` | Inicialización, carga, auditoría y medición |
+| `tests/` | Pruebas unitarias, HTTP y de integración |
+| `docs/` | Entregables, contrato API y evidencias |
 
 ## Arranque local
 
@@ -54,7 +56,15 @@ El cargador lee `database/fixtures/demo.json` y prepara los tres esquemas. Puede
 
 ## Pruebas sobre tres motores reales
 
-Parte de un proyecto de pruebas dedicado con la semilla de H0. No ejecutes estas pruebas en desarrollo: dos casos insertan temporalmente datos de prueba.
+Las [pruebas unitarias](tests/unit/) no requieren motores activos. Desde la raíz y tras ejecutar `python3 -m scripts.init_env`:
+
+```sh
+docker compose -p soundgraph-test build tools
+docker compose -p soundgraph-test run --rm --no-deps tools \
+  python -m pytest -p no:cacheprovider -q tests/unit
+```
+
+Para las pruebas de integración, usa el proyecto de pruebas y su propia semilla; algunos casos introducen datos temporales.
 
 ```sh
 docker compose -p soundgraph-test up -d --wait postgres mongo neo4j
@@ -72,12 +82,13 @@ La [guía de la API](docs/api/README.md) tiene la prueba HTTP aislada, incluidos
 
 ## Documentación de entrega
 
-- [Índice de los ocho entregables](docs/entregables.md)
+- [Índice vigente de los ocho entregables y sus evidencias](docs/entregables.md)
+- [Recorrido para instalar y demostrar la aplicación](docs/demostracion.md)
 - [Modelo integrado y diccionario de datos](docs/models/modelado-integrado.md)
 - [Arquitectura y selección tecnológica](docs/arquitectura.md)
+- [Qué usa cada base y cuándo intervienen los archivos del proyecto](docs/mapa-del-proyecto.md)
 - [Catálogo de operaciones y consultas](docs/catalogo-operaciones.md)
-- [Medición HTTP y resultados reproducibles](docs/evidence/2026-11-21-rendimiento.md)
+- [Validación de entrega y medición HTTP del 22 de noviembre](docs/evidence/2026-11-22-verificacion-entrega.md)
+- [Verificación en navegador: descubrimiento y guardado](docs/evidence/2026-11-21-h1-frontend.md) y [gestión de playlists y notas](docs/evidence/2026-11-21-h2-frontend.md)
 
-- [Verificación de la interfaz en navegador](docs/evidence/2026-11-21-h1-frontend.md)
-- [Diseño del MVP](docs/superpowers/specs/2026-11-21-soundgraph-mvp-design.md)
-- [Plan de implementación](docs/superpowers/plans/2026-11-21-soundgraph-mvp-implementation.md)
+**Documentos históricos de trabajo:** [diseño del MVP](docs/superpowers/specs/2026-11-21-soundgraph-mvp-design.md) y [plan de implementación](docs/superpowers/plans/2026-11-21-soundgraph-mvp-implementation.md). Para conocer lo implementado y probado, usa el índice vigente.
