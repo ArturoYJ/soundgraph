@@ -15,10 +15,10 @@ from backend.errors import ApiError, missing_song
 from backend.repositories.music import CatalogRepository, GraphRepository
 from backend.repositories.sql import SqlRepository
 from backend.schemas import (
-    ID_PATTERN, ErrorBody, Health, Login, NoteUpdate, Playlist, PlaylistDetail,
-    PlaylistInput, Playlists, Profile, Recommendations, SavedTrack, Song, SongPage, TrackOrder,
+    ID_PATTERN, CreatedProfile, ErrorBody, Health, Login, NoteUpdate, PersonalLogin, Playlist, PlaylistDetail,
+    PlaylistInput, Playlists, Profile, ProfileInput, Recommendations, SavedTrack, Song, SongPage, TrackOrder,
 )
-from backend.services import discovery, sessions
+from backend.services import discovery, profiles, sessions
 from scripts.storage import DATABASE_ERRORS, connect_postgres, create_graph_driver, create_mongo_client
 
 log = logging.getLogger("soundgraph.api")
@@ -37,7 +37,7 @@ async def lifespan(app):
 
 app = FastAPI(
     title="SoundGraph API", version="1.0.0", lifespan=lifespan,
-    description="API REST local de descubrimiento musical con datos sintéticos.",
+    description="API REST local de descubrimiento musical con perfiles personales y datos de escucha sintéticos.",
 )
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
@@ -157,6 +157,25 @@ def me(profile: User):
     return profile
 
 
+@api.post("/profiles", status_code=201, response_model=CreatedProfile, tags=["Sesión"],
+          responses=documented(403, 422, 503),
+          description="Crea un oyente y su sesión. Devuelve el código personal una sola vez; conserva graphPending si debe reintentar Neo4j.")
+def create_profile(payload: ProfileInput, request: Request, response: Response, sql: SQL, graph: Graph):
+    profile, token = profiles.create(sql, graph, payload, request.cookies.get(sessions.COOKIE))
+    response.set_cookie(sessions.COOKIE, token, max_age=sessions.TTL,
+                        httponly=True, samesite="strict", path="/api/v1")
+    return profile
+
+
+@api.post("/sessions", status_code=201, response_model=Profile, tags=["Sesión"],
+          responses=documented(401, 403, 422, 503), description="Entra con un código personal generado al crear el perfil.")
+def personal_login(payload: PersonalLogin, request: Request, response: Response, sql: SQL, graph: Graph):
+    profile, token = profiles.sign_in(sql, graph, payload, request.cookies.get(sessions.COOKIE))
+    response.set_cookie(sessions.COOKIE, token, max_age=sessions.TTL,
+                        httponly=True, samesite="strict", path="/api/v1")
+    return profile
+
+
 @api.delete("/demo/sessions/current", status_code=204, tags=["Sesión"], responses=documented(403, 503))
 def logout(request: Request, response: Response, sql: SQL):
     token_hash = sessions.hash_cookie(request.cookies.get(sessions.COOKIE))
@@ -169,7 +188,8 @@ def logout(request: Request, response: Response, sql: SQL):
 
 @api.get("/recommendations", response_model=Recommendations, tags=["Descubrimiento"],
          responses=documented(401, 422, 503))
-def recommendations(profile: User, graph: Graph, catalog: Catalog, limit: Annotated[int, Query(ge=1, le=25)] = 10):
+def recommendations(profile: User, sql: SQL, graph: Graph, catalog: Catalog, limit: Annotated[int, Query(ge=1, le=25)] = 10):
+    profiles.sync_graph(sql, graph, profile.profileId)
     return discovery.discover(profile, graph, catalog, limit)
 
 

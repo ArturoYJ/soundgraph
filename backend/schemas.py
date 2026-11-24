@@ -30,6 +30,19 @@ class Profile(BaseModel):
     role: Literal["listener", "editor"]
 
 
+class ProfileInput(StrictInput):
+    displayName: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+
+
+class PersonalLogin(StrictInput):
+    code: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=128)] = Field(repr=False)
+
+
+class CreatedProfile(Profile):
+    accessCode: str = Field(repr=False)
+    graphPending: bool
+
+
 class Credit(BaseModel):
     name: str
     role: str

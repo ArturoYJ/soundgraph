@@ -222,6 +222,101 @@ class ApiTests(unittest.TestCase):
                            cwd=ROOT, check=True, capture_output=True)
             self.assertEqual(client.send("DELETE", route)[0], 204)
 
+    def personal_graph_synced(self, profile_ids):
+        subprocess.run((*SQL_COMPOSE, "run", "--rm", "--no-deps", "tools", "python", "-c",
+                        "import sys\nfrom scripts.storage import open_stores\n"
+                        "with open_stores() as s:\n"
+                        "    for pid in sys.argv[1:]:\n"
+                        "        assert s.postgres.execute('SELECT graph_pending FROM personal_access WHERE profile_id=%s', (pid,)).fetchone() == (False,)\n"
+                        "        rows, _, _ = s.graph.execute_query('MATCH (p:Perfil {profileId: $pid}) RETURN count(p) AS n', pid=pid, database_='neo4j')\n"
+                        "        assert rows[0]['n'] == 1\n", *profile_ids), cwd=ROOT, check=True, capture_output=True)
+
+    def clean_personal_profiles(self, profile_ids):
+        if not profile_ids:
+            return
+        subprocess.run((*SQL_COMPOSE, "run", "--rm", "--no-deps", "tools", "python", "-c",
+                        "import sys\nfrom scripts.storage import open_stores\n"
+                        "with open_stores() as s:\n"
+                        "    for pid in sys.argv[1:]:\n"
+                        "        s.graph.execute_query('MATCH (p:Perfil {profileId: $pid}) DETACH DELETE p', pid=pid, database_='neo4j')\n"
+                        "        with s.postgres.transaction():\n"
+                        "            s.postgres.execute('DELETE FROM playlists WHERE owner_id=%s', (pid,))\n"
+                        "            s.postgres.execute('DELETE FROM profiles WHERE profile_id=%s', (pid,))\n", *profile_ids),
+                       cwd=ROOT, check=True, capture_output=True)
+
+    def test_09_personal_profiles_persist_relogin_and_isolate_playlists(self):
+        clients = [Client(), Client()]
+        created = []
+        try:
+            for client in clients:
+                status, body, _ = client.send("POST", BASE + "/profiles", {"displayName": "  Lucía  "})
+                self.assertEqual(status, 201)
+                created.append(body)
+                self.assertEqual(body["displayName"], "Lucía")
+                self.assertEqual(body["role"], "listener")
+                self.assertFalse(body["graphPending"])
+            self.assertNotEqual(created[0]["profileId"], created[1]["profileId"])
+            self.assertTrue(created[0]["accessCode"] != created[1]["accessCode"], "Los códigos deben ser independientes")
+            lists = []
+            for client in clients:
+                status, body, _ = client.send("POST", BASE + "/playlists", {"name": "Lista personal"})
+                self.assertEqual(status, 201)
+                lists.append(body["playlistId"])
+            route = BASE + "/playlists/" + lists[0]
+            for method, path, payload in (
+                ("GET", route, None), ("PATCH", route, {"name": "Ajena"}), ("DELETE", route, None),
+                ("PUT", route + "/tracks/c-cream", None), ("DELETE", route + "/tracks/c-cream", None),
+                ("PUT", route + "/track-order", {"songIds": []}),
+            ):
+                self.assertEqual(clients[1].send(method, path, payload)[0], 404)
+            for client, identity, playlist_id in zip(clients, created, lists):
+                status, current, _ = client.send("GET", BASE + "/demo/sessions/current")
+                self.assertEqual(status, 200)
+                self.assertEqual(current["profileId"], identity["profileId"])
+                self.assertNotIn("accessCode", current)
+                self.assertEqual(client.send("DELETE", BASE + "/demo/sessions/current")[0], 204)
+                self.assertEqual(client.send("GET", BASE + "/playlists")[0], 401)
+                status, current, _ = client.send("POST", BASE + "/sessions", {"code": identity["accessCode"]})
+                self.assertEqual(status, 201)
+                self.assertEqual(current["displayName"], "Lucía")
+                self.assertEqual(current["profileId"], identity["profileId"])
+                self.assertEqual([p["playlistId"] for p in client.send("GET", BASE + "/playlists")[1]["items"]], [playlist_id])
+                self.assertEqual(client.send("GET", BASE + "/songs")[0], 403)
+            self.assertEqual(Client().send("POST", BASE + "/sessions", {"code": "Lucía"})[0], 401)
+            for payload in ({"displayName": "  "}, {"displayName": "Isaac", "role": "editor"}):
+                self.assertEqual(Client().send("POST", BASE + "/profiles", payload)[0], 422)
+            self.personal_graph_synced([p["profileId"] for p in created])
+        finally:
+            self.clean_personal_profiles([p["profileId"] for p in created])
+
+    def test_10_personal_creation_survives_graph_outage_and_reconciles(self):
+        client = Client()
+        created = None
+        try:
+            subprocess.run((*SQL_COMPOSE, "stop", "neo4j"), cwd=ROOT, check=True, capture_output=True)
+            try:
+                status, body, _ = client.send("POST", BASE + "/profiles", {"displayName": "Perfil pendiente"})
+                self.assertEqual(status, 201)
+                created = body
+                self.assertTrue(body["graphPending"])
+                self.assertEqual(client.send("GET", BASE + "/demo/sessions/current")[1]["displayName"], "Perfil pendiente")
+                status, body, _ = client.send("GET", BASE + "/recommendations")
+                self.assertEqual((status, body["code"]), (503, "service_unavailable"))
+                self.assertEqual(client.send("DELETE", BASE + "/demo/sessions/current")[0], 204)
+                self.assertEqual(client.send("POST", BASE + "/sessions", {"code": created["accessCode"]})[0], 201)
+            finally:
+                subprocess.run((*SQL_COMPOSE, "up", "-d", "--wait", "--wait-timeout", "100", "neo4j"), cwd=ROOT, check=True, capture_output=True)
+            deadline = time.monotonic() + 60
+            while client.send("GET", "/health/ready")[0] != 200:
+                if time.monotonic() >= deadline:
+                    self.fail("Neo4j no recuperó disponibilidad")
+                time.sleep(1)
+            status, body, _ = client.send("GET", BASE + "/recommendations")
+            self.assertEqual((status, body), (200, {"items": [], "partial": False}))
+            self.personal_graph_synced([created["profileId"]])
+        finally:
+            self.clean_personal_profiles([created["profileId"]] if created else [])
+
     def test_07_graph_failure_is_not_empty_and_recovers(self):
         client = self.login()
         subprocess.run((*SQL_COMPOSE, "stop", "neo4j"), cwd=ROOT, check=True, capture_output=True)

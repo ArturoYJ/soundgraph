@@ -10,6 +10,7 @@ class SqlRepository:
 
     def ready(self):
         self.db.execute("SELECT 1 FROM demo_sessions LIMIT 1")
+        self.db.execute("SELECT 1 FROM personal_access LIMIT 1")
 
     @staticmethod
     def profile(row):
@@ -41,6 +42,35 @@ class SqlRepository:
 
     def delete_session(self, token_hash):
         self.db.execute("DELETE FROM demo_sessions WHERE token_hash=%s", (token_hash,))
+
+    def create_personal_profile(self, profile_id, name, code_hash, token_hash, expires_at, previous_hash):
+        with self.db.transaction():
+            self.db.execute(
+                "INSERT INTO profiles (profile_id, display_name, role) VALUES (%s,%s,'listener')",
+                (profile_id, name),
+            )
+            self.db.execute(
+                "INSERT INTO personal_access (profile_id, code_hash) VALUES (%s,%s)",
+                (profile_id, code_hash),
+            )
+            self.create_session(token_hash, profile_id, expires_at, previous_hash)
+        return Profile(profileId=profile_id, displayName=name, role="listener")
+
+    def find_personal_profile(self, profile_id, code_hash):
+        return self.profile(self.db.execute(
+            """SELECT p.profile_id, p.display_name, p.role FROM profiles p
+               JOIN personal_access a USING (profile_id)
+               WHERE p.profile_id=%s AND a.code_hash=%s""", (profile_id, code_hash),
+        ).fetchone())
+
+    def graph_pending(self, profile_id):
+        row = self.db.execute(
+            "SELECT graph_pending FROM personal_access WHERE profile_id=%s", (profile_id,),
+        ).fetchone()
+        return bool(row and row[0])
+
+    def mark_graph_synced(self, profile_id):
+        self.db.execute("UPDATE personal_access SET graph_pending=false WHERE profile_id=%s", (profile_id,))
 
     def list_playlists(self, owner):
         rows = self.db.execute(
