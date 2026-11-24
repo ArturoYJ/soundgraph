@@ -59,7 +59,7 @@ def invalid_request(_request, exc):
 
 
 def dependency_error(_request, exc):
-    log.warning("database_request_failed type=%s", type(exc).__name__)
+    log.warning("database_request_failed type=%s code=%s", type(exc).__name__, getattr(exc, "code", None))
     return error_response(503, "service_unavailable", "Servicio temporalmente no disponible.")
 
 

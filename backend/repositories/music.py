@@ -53,7 +53,9 @@ class GraphRepository:
         self.driver = driver
 
     def ready(self):
-        self.driver.execute_query(Query("RETURN 1", timeout=3), database_="neo4j", routing_="r")
+        # RETURN 1 can succeed before the recommendation plan has compiled after
+        # a restart. Exercise the real read (including its timeout) before 200.
+        self.recommendations("p-ana-main", 1)
 
     def recommendations(self, profile_id, limit):
         records, _, _ = self.driver.execute_query(
