@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "SoundGraph API",
-    "description": "API REST local de descubrimiento musical con datos sintéticos.",
+    "description": "API REST local de descubrimiento musical con perfiles personales y datos de escucha sintéticos.",
     "version": "1.0.0"
   },
   "paths": {
@@ -165,6 +165,140 @@
           },
           "403": {
             "description": "Permiso u origen no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Una dependencia no está disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles": {
+      "post": {
+        "tags": [
+          "Sesión"
+        ],
+        "summary": "Create Profile",
+        "description": "Crea un oyente y su sesión. Devuelve el código personal una sola vez; conserva graphPending si debe reintentar Neo4j.",
+        "operationId": "create_profile_api_v1_profiles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedProfile"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permiso u origen no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Entrada u orden no válido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Una dependencia no está disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions": {
+      "post": {
+        "tags": [
+          "Sesión"
+        ],
+        "summary": "Personal Login",
+        "description": "Entra con un código personal generado al crear el perfil.",
+        "operationId": "personal_login_api_v1_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonalLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión o credenciales no válidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permiso u origen no permitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Entrada u orden no válido",
             "content": {
               "application/json": {
                 "schema": {
@@ -1201,6 +1335,44 @@
   },
   "components": {
     "schemas": {
+      "CreatedProfile": {
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,63}$",
+            "title": "Profileid"
+          },
+          "displayName": {
+            "type": "string",
+            "title": "Displayname"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "listener",
+              "editor"
+            ],
+            "title": "Role"
+          },
+          "accessCode": {
+            "type": "string",
+            "title": "Accesscode"
+          },
+          "graphPending": {
+            "type": "boolean",
+            "title": "Graphpending"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profileId",
+          "displayName",
+          "role",
+          "accessCode",
+          "graphPending"
+        ],
+        "title": "CreatedProfile"
+      },
       "Credit": {
         "properties": {
           "name": {
@@ -1349,6 +1521,22 @@
         ],
         "title": "NoteUpdate"
       },
+      "PersonalLogin": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "PersonalLogin"
+      },
       "Playlist": {
         "properties": {
           "playlistId": {
@@ -1464,6 +1652,22 @@
           "role"
         ],
         "title": "Profile"
+      },
+      "ProfileInput": {
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Displayname"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "displayName"
+        ],
+        "title": "ProfileInput"
       },
       "Recommendation": {
         "properties": {

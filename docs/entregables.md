@@ -2,13 +2,15 @@
 
 Este es el índice vigente del integrador. Cada entregable enlaza su artefacto y, cuando corresponde, la evidencia de ejecución. El plan y el diseño del MVP se conservan como antecedentes de trabajo.
 
+La [actualización local de perfiles personales, recuperación de Neo4j e interfaz](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra las pruebas afectadas y el pendiente de revisión visual móvil; sus resultados se separan de las ejecuciones históricas siguientes.
+
 | Entregable de la guía | Dónde revisarlo |
 | --- | --- |
 | 1. Propuesta | [Problema, objetivo, usuarios, alcance y casos de uso](propuesta.md). |
 | 2. Modelado | [Conceptual](models/modelado-integrado.md#modelo-conceptual-común), [relacional](models/modelado-integrado.md#relacional--postgresql), [documental](models/modelado-integrado.md#documental--mongodb), [grafo](models/modelado-integrado.md#grafo--neo4j) y [reglas entre motores](models/modelado-integrado.md#reglas-entre-motores). |
 | 3. Arquitectura y selección tecnológica | [Diagrama, matriz tecnológica, decisión REST y consistencia](arquitectura.md). |
 | 4. Implementación de las tres bases | [Esquemas y semilla](../database/), [scripts SQL de carga](../database/postgres/seed/), [scripts Cypher de carga](../database/neo4j/seed/), [cargador](../scripts/seed.py), [evidencia de carga e integridad](evidence/2026-11-21-h0-data-seed.md), [consultas observadas por motor](catalogo-operaciones.md#consultas-representativas-por-motor) y [prueba de cardinalidad del grafo](evidence/2026-11-22-verificacion-entrega.md#cardinalidad-y-dirección-en-neo4j). |
-| 5. Catálogo de operaciones y consultas | [16 operaciones de la API, entradas, resultados esperados y pruebas observadas](catalogo-operaciones.md). |
+| 5. Catálogo de operaciones y consultas | [18 operaciones de la API, entradas, resultados esperados y pruebas observadas](catalogo-operaciones.md). |
 | 6. Backend y API | [Rutas](../backend/main.py), [servicios](../backend/services/), [repositorios](../backend/repositories/) y [contrato](api/openapi.json). |
 | 7. Aplicación e integración | [Frontend](../frontend/), [recorrido de evaluación](demostracion.md), [evidencia de recomendación, ficha, guardado y recarga](evidence/2026-11-21-h1-frontend.md) y [evidencia de gestión de playlists y editor de notas](evidence/2026-11-21-h2-frontend.md). |
 | 8. Pruebas, documentación y despliegue | [Instrucciones de ejecución](../README.md#arranque-local), [configuración de ejemplo](../.env.example), [pruebas unitarias](../tests/unit/), [integración](../tests/integration/), [pruebas HTTP](../tests/http/) y [validación de entrega y medición HTTP](evidence/2026-11-22-verificacion-entrega.md). Repositorio: [ArturoYJ/soundgraph](https://github.com/ArturoYJ/soundgraph). |

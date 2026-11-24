@@ -8,7 +8,9 @@
 
 | ID · propósito | Ruta · motores | Entrada y validación | Salida esperada | Límites, errores y evidencia observada |
 | --- | --- | --- | --- | --- |
-| S-00 · comprobar dependencias | `GET /health/ready` (sin prefijo) · PG + MG + NG | Sin entrada | `200`, `{"status":"ok"}` | H01: disponibilidad normal; H07: Neo4j detenido devolvió `503` y se recuperó. |
+| S-04 · crear perfil personal | `POST /profiles` · PG + NG | `displayName` de 1–100 caracteres; no admite rol ni ID | `201`, perfil oyente, código personal y cookie | Fallo de grafo tras confirmar SQL deja `graphPending: true`, reintentable. |
+| S-05 · entrar con código personal | `POST /sessions` · PG + NG si pendiente | `code` completo generado al crear | `201`, perfil y cookie | Código incorrecto → `401`; reconcilia el nodo pendiente sin cambiar identidad. |
+| S-00 · comprobar dependencias | `GET /health/ready` (sin prefijo) · PG + MG + NG | Sin entrada | `200`, `{"status":"ok"}` | Comprueba también la consulta real de recomendación. H07 exige primera recomendación correcta tras reiniciar Neo4j. |
 | S-01 · iniciar sesión | `POST /demo/sessions` · PG | `profileId` válido y `code` de 1–128 caracteres; credenciales correctas | `201`, perfil y cookie HttpOnly/SameSite Strict | H02: código incorrecto → `401`; sesiones válidas emitidas en la suite. Códigos solo locales. |
 | S-02 · recuperar sesión | `GET /demo/sessions/current` · PG | Cookie y sesión vigente | `200`, `{profileId, displayName, role}` | H02: perfil válido; la revocación del token se comprobó en una ruta protegida distinta. |
 | S-03 · cerrar sesión | `DELETE /demo/sessions/current` · PG si hay token reconocible | Cookie si está presente; origen permitido | `204`, sin cuerpo; revoca sesión y elimina cookie | H02: revocación comprobada; escribir desde un origen no permitido se rechaza con `403` (probado con creación de playlist). |
@@ -28,6 +30,8 @@
 **Trazabilidad.** H01–H08 identifican `test_01` a `test_08` de la [suite HTTP](../tests/http/test_api.py). El [registro de entrega del 22 de noviembre](evidence/2026-11-22-verificacion-entrega.md#evidencia-por-tipo-de-prueba) documenta las 9 pruebas HTTP aprobadas. La [evidencia REST de H1](evidence/2026-11-21-h1-rest-api.md) describe los casos iniciales y su [evidencia en navegador](evidence/2026-11-21-h1-frontend.md) registra la recomendación, el guardado y la recarga. La [evidencia de H2](evidence/2026-11-21-h2-frontend.md) documenta la gestión de playlists, las notas y el caso H08 de lecturas y permisos editoriales. H00 verifica la entrega de los recursos frontend y no representa una operación de dominio. La [medición HTTP de la candidata](evidence/2026-11-22-verificacion-entrega.md#medición-http-de-la-versión-candidata) es una ejecución separada.
 
 ## Consultas representativas por motor
+
+Las nuevas operaciones de perfiles se verifican en H09 (identidad, acceso posterior y separación de playlists) y H10 (alta durante caída del grafo y reconciliación). La [evidencia del 23 de noviembre](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra también la reproducción y corrección de H07 sin alterar su aserción.
 
 Se ejecutaron en el entorno aislado `soundgraph-bench` con la semilla sin pistas guardadas. Las dos primeras son lecturas representativas; la tercera usa literalmente el archivo Cypher del integrador.
 
