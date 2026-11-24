@@ -53,7 +53,18 @@ class GraphRepository:
         self.driver = driver
 
     def ready(self):
-        self.driver.execute_query(Query("RETURN 1", timeout=3), database_="neo4j", routing_="r")
+        # RETURN 1 can succeed before the recommendation plan has compiled after
+        # a restart. Exercise the real read (including its timeout) before 200.
+        self.recommendations("p-ana-main", 1)
+
+    def ensure_profile(self, profile_id):
+        # One attempt: SQL retains the pending flag, so retrying a managed
+        # transaction here only delays sign-in while a dependency is offline.
+        with self.driver.session(database="neo4j") as session:
+            session.run(
+                Query("MERGE (:Perfil {profileId: $profile_id})", timeout=4),
+                profile_id=profile_id,
+            ).consume()
 
     def recommendations(self, profile_id, limit):
         records, _, _ = self.driver.execute_query(

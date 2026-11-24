@@ -28,6 +28,7 @@ El siguiente diagrama muestra las relaciones físicas dentro de PostgreSQL. La r
 erDiagram
     PROFILES ||--o{ PLAYLISTS : posee
     PROFILES ||--o{ DEMO_SESSIONS : abre
+    PROFILES ||--o| PERSONAL_ACCESS : autentica
     PLAYLISTS ||--o{ PLAYLIST_TRACKS : contiene
     PROFILES {
         text profile_id PK
@@ -48,6 +49,11 @@ erDiagram
         text token_hash PK
         text profile_id FK
         timestamptz expires_at
+    }
+    PERSONAL_ACCESS {
+        text profile_id PK,FK
+        text code_hash
+        boolean graph_pending
     }
 ```
 
@@ -112,6 +118,12 @@ La flecha indica la dirección de la relación. Las propiedades enlazan lógicam
 | Relación `ESCUCHÓ` | De `Perfil` hacia `Cancion`, sin propiedades en la semilla. Un perfil puede tener cero o muchas canciones escuchadas; una canción, cero o muchos perfiles oyentes. Se espera una relación por par en la carga. |
 
 La carga valida referencias y pares antes de escribir y usa `MERGE`. Las restricciones de unicidad respaldan con índices los accesos por identificador, pero **no obligan por sí solas a que la propiedad exista ni limitan la multiplicidad de relaciones**. La auditoría detecta identificadores ausentes y referencias huérfanas; no comprueba toda la cardinalidad del grafo. La [consulta de recomendación](../../database/neo4j/queries/recommendations.cypher) excluye canciones ya escuchadas y usa `count(DISTINCT similar)` para contar perfiles, no caminos.
+
+## Perfiles personales
+
+Además de la semilla, la API admite perfiles locales nuevos con nombre de 1–100 caracteres, identificador aleatorio y rol `listener`. El nombre no es único ni una credencial. Cada alta genera un código de acceso de alta entropía; PostgreSQL conserva únicamente su hash SHA-256.
+
+La [migración aditiva](../../database/postgres/003_personal_profiles.sql) crea `personal_access`: `profile_id` es PK/FK a `profiles` con borrado en cascada; `code_hash` es hexadecimal de 64 caracteres y `graph_pending` es booleano, inicialmente verdadero. Perfil, acceso y sesión se insertan en una transacción SQL. Después se incorpora el nodo `Perfil` con el mismo ID a Neo4j mediante `MERGE`, sin crear escuchas. La marca se limpia al terminar; un fallo parcial queda reintentable desde acceso o recomendaciones. PostgreSQL sigue siendo la fuente de identidad.
 
 ## Reglas entre motores
 

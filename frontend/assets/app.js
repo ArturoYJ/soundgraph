@@ -23,6 +23,36 @@ let saving = false;
 let leaving = false;
 let sheetDismiss = null;
 let dirtyEditor = null;
+let accessMode = "create";
+let pendingAccess = null;
+
+function setAccessMode(mode, focus = false) {
+  accessMode = mode;
+  const modes = {
+    create: ["Crea tu espacio", "Tu nombre, tus playlists y un código para volver cuando quieras.", "create-profile-form", "display-name"],
+    personal: ["Vuelve a tu música", "Tu código abre tu perfil y tus playlists. El nombre no es tu contraseña.", "personal-login-form", "personal-code"],
+    demo: ["Explora la demo", "Prueba los perfiles con escuchas precargadas o entra como Editor.", "login-form", "profile"],
+  };
+  for (const [key, [, , form]] of Object.entries(modes)) {
+    get(form).hidden = key !== mode;
+    get("access-" + key).setAttribute("aria-pressed", String(key === mode));
+  }
+  get("login-title").textContent = modes[mode][0];
+  get("access-description").textContent = modes[mode][1];
+  get("access-warning").hidden = true;
+  if (focus) get(modes[mode][3]).focus();
+}
+
+for (const mode of ["create", "personal", "demo"]) {
+  get("access-" + mode).addEventListener("click", () => setAccessMode(mode, true));
+}
+
+function accessBusy(busy) {
+  for (const form of [loginForm, get("create-profile-form"), get("personal-login-form")]) {
+    for (const control of form.elements) control.disabled = busy;
+  }
+  for (const mode of ["create", "personal", "demo"]) get("access-" + mode).disabled = busy;
+}
 
 class RequestError extends Error {
   constructor(status, code) {
@@ -137,14 +167,18 @@ function showLogin(message = "", focus = false) {
   get("login").hidden = false;
   view.replaceChildren();
   loginForm.reset();
-  loginWarning.hidden = !message;
-  loginWarning.textContent = message;
+  get("create-profile-form").reset();
+  get("personal-login-form").reset();
+  setAccessMode(accessMode);
+  get("access-warning").hidden = !message;
+  get("access-warning").textContent = message;
   document.title = "Acceso · SoundGraph";
   if (focus) get("login-title").focus();
 }
 
 function showAccount(nextProfile) {
-  profile = nextProfile;
+  const { profileId, displayName, role } = nextProfile;
+  profile = { profileId, displayName, role };
   get("login").hidden = true;
   get("nav").hidden = false;
   get("editor-link").hidden = profile.role !== "editor";
@@ -183,7 +217,7 @@ loginForm.addEventListener("submit", async event => {
   const code = get("code");
   const select = get("profile");
   const credentials = { profileId: select.value, code: code.value };
-  select.disabled = code.disabled = true;
+  accessBusy(true);
   try {
     const next = await api("/demo/sessions", { method: "POST", body: credentials });
     loginForm.reset();
@@ -196,11 +230,128 @@ loginForm.addEventListener("submit", async event => {
       : error.code === "invalid_input" ? "Revisa el perfil y el código."
       : "No pudimos iniciar la sesión. Intenta de nuevo.";
   } finally {
-    loginSubmit.disabled = select.disabled = code.disabled = false;
+    accessBusy(false);
     loginSubmit.textContent = "Entrar";
     if (!profile) code.focus();
   }
 });
+
+get("personal-login-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const submit = get("personal-submit");
+  if (submit.disabled) return;
+  const warning = get("personal-warning");
+  warning.hidden = true;
+  const code = get("personal-code").value.trim();
+  accessBusy(true);
+  submit.textContent = "Entrando…";
+  try {
+    const next = await api("/sessions", { method: "POST", body: { code } });
+    get("personal-login-form").reset();
+    showAccount(next);
+    await renderRoute({ focus: true });
+  } catch (error) {
+    get("personal-code").value = "";
+    warning.textContent = error.code === "invalid_credentials" ? "El código personal no es válido. Revisa que esté completo." : "No pudimos iniciar la sesión. Intenta de nuevo.";
+    warning.hidden = false;
+  } finally {
+    accessBusy(false);
+    submit.textContent = "Volver a mi perfil";
+    if (!profile) get("personal-code").focus();
+  }
+});
+
+get("create-profile-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const submit = get("create-submit");
+  if (submit.disabled) return;
+  const warning = get("create-warning");
+  warning.hidden = true;
+  const displayName = get("display-name").value.trim();
+  if (!displayName || [...displayName].length > 100) {
+    warning.textContent = "Escribe un nombre de 1 a 100 caracteres.";
+    warning.hidden = false;
+    get("display-name").focus();
+    return;
+  }
+  accessBusy(true);
+  submit.textContent = "Creando tu perfil…";
+  try {
+    const created = await api("/profiles", { method: "POST", body: { displayName } });
+    get("create-profile-form").reset();
+    showAccount(created);
+    // Keep the access code available before any subsequent request can fail.
+    pendingAccess = { ...created, hash: location.hash };
+    await renderRoute({ focus: true });
+    accessCodeSheet(created);
+  } catch (error) {
+    warning.textContent = error.code === "invalid_input" ? "Revisa tu nombre e inténtalo de nuevo." :
+      "No pudimos confirmar la creación. Recarga para comprobar tu sesión antes de volver a intentarlo.";
+    warning.hidden = false;
+  } finally {
+    accessBusy(false);
+    submit.textContent = "Crear mi perfil";
+  }
+});
+
+get("personal-login-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const submit = get("personal-submit");
+  if (submit.disabled) return;
+  const code = get("personal-code");
+  const credentials = { code: code.value.trim() };
+  const warning = get("personal-warning");
+  warning.hidden = true;
+  accessBusy(true);
+  submit.textContent = "Entrando…";
+  try {
+    showAccount(await api("/sessions", { method: "POST", body: credentials }));
+    get("personal-login-form").reset();
+    await renderRoute({ focus: true });
+  } catch (error) {
+    code.value = "";
+    warning.textContent = error.code === "invalid_credentials" ? "El código personal no es válido." :
+      "No pudimos iniciar la sesión. Intenta de nuevo.";
+    warning.hidden = false;
+  } finally {
+    accessBusy(false);
+    submit.textContent = "Volver a mi perfil";
+    if (!profile) code.focus();
+  }
+});
+
+function accessCodeSheet(created) {
+  openSheet("access", "Tu perfil ya tiene nombre", get("discover-link"));
+  sheet.append(el("p", "Bienvenido, " + created.displayName + ". Guarda este código: lo necesitarás para volver a entrar desde «Mi código».", "muted"));
+  if (created.graphPending) sheet.append(notice("Tu perfil está guardado. Las recomendaciones estarán disponibles cuando termine de recuperarse el servicio."));
+  const label = el("label", "Tu código personal");
+  label.htmlFor = "new-access-code";
+  const code = el("input", null, "access-code");
+  code.id = label.htmlFor;
+  code.type = "password";
+  code.readOnly = true;
+  code.autocomplete = "off";
+  code.value = created.accessCode;
+  const feedback = notice("Guárdalo en un lugar privado. No se mostrará de nuevo.");
+  const show = button("Mostrar código", () => {
+    code.type = code.type === "password" ? "text" : "password";
+    show.textContent = code.type === "password" ? "Mostrar código" : "Ocultar código";
+  }, "quiet");
+  const copy = button("Copiar código", async () => {
+    try {
+      await navigator.clipboard.writeText(created.accessCode);
+      feedback.textContent = "Código copiado. Guárdalo antes de continuar.";
+    } catch {
+      code.type = "text";
+      show.textContent = "Ocultar código";
+      code.focus(); code.select();
+      feedback.textContent = "Copia el código seleccionado y guárdalo en un lugar privado.";
+    }
+  });
+  const done = button("Ya guardé mi código", () => { pendingAccess = null; closeSheet(); }, "primary");
+  sheetDismiss = () => { feedback.textContent = "Guarda tu código y pulsa «Ya guardé mi código» para continuar."; done.focus(); };
+  sheet.append(label, code, actions(show, copy), feedback, actions(done));
+}
 
 get("logout").addEventListener("click", async () => {
   if (leaving) return;
@@ -245,7 +396,7 @@ async function renderRoute({ focus = false } = {}) {
   if (back) view.append(link("← Volver a mis playlists", links.playlists, "quiet compact back"));
   const title = heading(
     discover ? "Descubre música" : back ? "Playlist" : editorial ? "Catálogo editorial" : "Mis playlists",
-    discover ? "Recomendaciones basadas en escuchas compartidas." :
+    discover ? "Conexiones con sentido. Recomendaciones basadas en escuchas compartidas." :
       editorial && profile.role === "editor" ? "Elige una canción para consultar y actualizar sus notas." : null,
   );
   document.title = title.textContent + " · SoundGraph";
@@ -845,12 +996,16 @@ document.querySelector(".skip").addEventListener("click", event => {
   get("main").focus();
 });
 window.addEventListener("beforeunload", event => {
-  if (dirtyEditor?.isDirty()) {
+  if (pendingAccess || dirtyEditor?.isDirty()) {
     event.preventDefault();
     event.returnValue = "";
   }
 });
 window.addEventListener("hashchange", () => {
+  if (pendingAccess) {
+    history.replaceState(null, "", "/" + pendingAccess.hash);
+    return;
+  }
   if (dirtyEditor?.isDirty() && location.hash !== dirtyEditor.hash) {
     const destination = location.hash;
     history.replaceState(null, "", "/" + dirtyEditor.hash);

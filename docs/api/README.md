@@ -18,6 +18,8 @@ Mismo origen; cookie opaca temporal, `HttpOnly`, `SameSite=Strict` y revocada en
 
 | Método y ruta bajo `/api/v1` | Entrada y salida |
 | --- | --- |
+| `POST /profiles` | `{displayName}` de 1–100 caracteres tras recorte, sin rol ni ID → `201 {profileId,displayName,role,accessCode,graphPending}` y sesión. Rol siempre `listener`. Guarda el código completo: se devuelve solo al crear. |
+| `POST /sessions` | `{code}` personal completo → `201` con perfil y cookie. Código incorrecto → `401`; el nombre no autentica. |
 | `POST /demo/sessions` | `{profileId, code}` → `201` con `{profileId, displayName, role}` y cookie |
 | `GET /demo/sessions/current`, `DELETE /demo/sessions/current` | Perfil actual `200` o cierre `204` |
 | `GET /recommendations?limit=10` | `200 {items:[{song, affinity}], partial}`. Límite 1–25; `song={songId,title,editorial}`. |
@@ -32,6 +34,14 @@ Mismo origen; cookie opaca temporal, `HttpOnly`, `SameSite=Strict` y revocada en
 Los errores gestionados usan `{code,message}` y, para validación de campos, pueden añadir `fields`. Códigos útiles: `invalid_credentials`, `session_required`, `invalid_origin`, `editor_required`, `playlist_not_found`, `song_not_found`, `invalid_input`, `invalid_track_order`, `service_unavailable`.
 
 **Consistencia:** PostgreSQL verifica la sesión y posee las playlists; Neo4j devuelve candidatos; MongoDB hidrata fichas en bloque. Se omiten recomendaciones con ficha ausente y se marca `partial: true`. Guardar valida un identificador existente y escribe en una sola transacción SQL. El bloqueo de la fila de playlist serializa operaciones concurrentes sobre sus pistas; las altas repetidas no cambian la posición. La edición de notas escribe únicamente en MongoDB. El formulario carga la ficha al abrirse y envía la sección completa de notas; si dos editores guardan sobre una misma ficha, prevalece la última escritura, sin control de versiones.
+
+## Perfiles personales y fallos parciales
+
+La cookie, recuperación de sesión y cierre existentes sirven para ambos tipos de perfil. `GET /demo/sessions/current` nunca devuelve el código. Los códigos de demostración siguen en la configuración local; los personales se guardan como SHA-256 de un secreto aleatorio de alta entropía en `personal_access`. El alta no admite ID ni rol.
+
+La identidad y sesión se confirman primero en PostgreSQL. Después se hace `MERGE` del nodo de perfil en Neo4j y solo entonces se limpia `graph_pending`. Un fallo parcial conserva la identidad y devuelve `201` con `graphPending: true`. Entrar con el código o consultar recomendaciones reintenta la sincronización sin duplicar nodos. Si la dependencia sigue caída, recomendaciones devuelve `503`, nunca un vacío simulado; las playlists siguen disponibles si PostgreSQL funciona. Dos altas con igual nombre crean identidades independientes.
+
+La salud verifica la consulta real de recomendaciones, incluida su preparación en frío y su timeout. H07 mantiene la exigencia de que la primera recomendación funcione tras recuperar salud; no se relaja su aserción.
 
 ## Prueba HTTP aislada
 

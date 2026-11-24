@@ -13,7 +13,7 @@ El objetivo es demostrar un flujo funcional que coordine datos transaccionales, 
 | Oyente | Entender la recomendación y conservar una canción | Entrar, descubrir, ver la ficha, guardar y volver a abrir la playlist. Desde Mis playlists puede crear, renombrar, eliminar, reordenar y quitar pistas. |
 | Editor | Corregir o actualizar el contexto de una canción | Reemplazar las notas editoriales y sus fuentes desde Editorial, sin cambiar las escuchas ni las playlists. |
 
-El prototipo no reproduce audio, no recopila escuchas de usuarios reales ni ofrece registro público. Los perfiles e historiales se precargan para una demostración académica reproducible.
+El prototipo no reproduce audio ni recopila escuchas de usuarios reales. Los perfiles e historiales de demostración se precargan; también se pueden crear perfiles locales de oyente con nombre propio y acceso por código, sin historial inicial.
 
 ## Por qué tres modelos
 
