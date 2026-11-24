@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f2eb">
+  <meta name="theme-color" content="#101018">
   <title>SoundGraph</title>
   <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/app.css">
@@ -13,7 +13,7 @@
   <a class="skip" href="#main">Saltar al contenido</a>
   <header class="site-header">
     <div class="topbar">
-      <div class="brand"><span class="wordmark">SoundGraph</span> <span class="mode">Modo demo</span></div>
+      <div class="brand"><img src="/assets/mark.svg" width="36" height="36" alt=""><span class="wordmark">SoundGraph</span><span class="mode">Descubrimiento musical</span></div>
       <nav id="nav" aria-label="Principal" hidden>
         <a id="discover-link" href="#/descubrir">Descubrir</a>
         <a id="lists-link" href="#/playlists">Mis playlists</a>
@@ -27,10 +27,38 @@
     </div>
   </header>
   <main id="main" tabindex="-1">
-    <section id="login" class="login surface" aria-labelledby="login-title" hidden>
-      <h1 id="login-title" tabindex="-1">Entra a la demo</h1>
-      <p class="muted">Los perfiles y las escuchas son datos de prueba.</p>
-      <form id="login-form">
+    <section id="login" class="auth-layout" aria-labelledby="login-title" hidden>
+      <div class="auth-story">
+        <p class="eyebrow">MÚSICA QUE CONECTA</p>
+        <h2>Tu próxima<br>conexión <span>musical.</span></h2>
+        <p class="auth-description">Descubre canciones a través de escuchas compartidas. Conoce su historia y dale un lugar en tus playlists.</p>
+        <div class="record-scene" aria-hidden="true"><div class="record-orbit"></div><div class="record"><span>SG</span></div><span class="record-caption">Cada descubrimiento tiene un porqué.</span></div>
+        <div class="feature-tags"><span>Afinidad explicada</span><span>Playlists propias</span><span>Fichas editoriales</span></div>
+      </div>
+      <div class="access-card surface">
+      <div class="access-tabs" role="group" aria-label="Forma de acceso">
+        <button id="access-create" type="button" aria-pressed="true">Crear perfil</button>
+        <button id="access-personal" type="button" aria-pressed="false">Mi código</button>
+        <button id="access-demo" type="button" aria-pressed="false">Demo / Editor</button>
+      </div>
+      <h1 id="login-title" tabindex="-1">Crea tu espacio</h1>
+      <p id="access-description" class="muted">Tu nombre, tus playlists y un código para volver cuando quieras.</p>
+      <p id="access-warning" class="notice error" role="alert" hidden></p>
+      <form id="create-profile-form" method="post">
+        <label for="display-name">¿Cómo te llamas?</label>
+        <input id="display-name" name="displayName" type="text" maxlength="100" required autocomplete="nickname" placeholder="Tu nombre">
+        <p class="secondary-text">Crearás un perfil de oyente. Guarda el código que recibirás para volver a entrar.</p>
+        <p id="create-warning" class="notice error" role="alert" hidden></p>
+        <button id="create-submit" class="button primary" type="submit">Crear mi perfil</button>
+      </form>
+      <form id="personal-login-form" method="post" hidden>
+        <label for="personal-code">Código personal</label>
+        <input id="personal-code" name="code" type="password" maxlength="128" required autocomplete="off" spellcheck="false" placeholder="Pega el código de tu perfil">
+        <p class="secondary-text">Usa el código completo que guardaste al crear tu perfil.</p>
+        <p id="personal-warning" class="notice error" role="alert" hidden></p>
+        <button id="personal-submit" class="button primary" type="submit">Volver a mi perfil</button>
+      </form>
+      <form id="login-form" method="post" hidden>
         <label for="profile">Perfil</label>
         <select id="profile" name="profileId" required>
           <option value="">Selecciona un perfil</option>
@@ -44,6 +72,8 @@
         <p id="login-warning" class="notice error" role="alert" hidden></p>
         <button id="login-submit" class="button primary" type="submit">Entrar</button>
       </form>
+      <p class="access-footnote">Una forma distinta de descubrir. Sin reproducción de audio.</p>
+      </div>
     </section>
     <div id="notification" class="notification" hidden><span id="notification-text" role="status"></span><a id="notification-link" class="button quiet compact" hidden>Ver playlist</a></div>
     <section id="view" class="view"><p class="muted" role="status">Comprobando la sesión…</p></section>
