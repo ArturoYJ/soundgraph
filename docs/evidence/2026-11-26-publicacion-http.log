@@ -1,0 +1,16 @@
+test_00_same_origin_frontend (__main__.ApiTests) ... ok
+test_01_openapi_and_readiness (__main__.ApiTests) ... ok
+test_02_session_denied_cross_origin_and_revoked (__main__.ApiTests) ... ok
+test_03_recommendation_and_empty_profile (__main__.ApiTests) ... ok
+test_04_playlist_concurrency_order_and_crud (__main__.ApiTests) ... ok
+test_05_editor_updates_only_notes (__main__.ApiTests) ... ok
+test_06_partial_recommendation_and_orphan_playlist (__main__.ApiTests) ... ok
+test_07_graph_failure_is_not_empty_and_recovers (__main__.ApiTests) ... ok
+test_08_editorial_catalog_reads_and_permissions (__main__.ApiTests) ... ok
+test_09_personal_profiles_persist_relogin_and_isolate_playlists (__main__.ApiTests) ... ok
+test_10_personal_creation_survives_graph_outage_and_reconciles (__main__.ApiTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 44.561s
+
+OK
