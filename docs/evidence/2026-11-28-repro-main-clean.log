@@ -1,0 +1,53 @@
+# Reproducibilidad limpia de GitHub main — 28 de noviembre de 2026
+
+## Fuente y aislamiento
+
+- Remoto comprobado: `https://github.com/ArturoYJ/soundgraph.git`, rama `main`.
+- Se clonó en una carpeta nueva `soundgraph-main-clean-20261128`; `HEAD` al iniciar: `a24b4416b8add95d959c75cde4f096ddaba4530d` (`## main...origin/main`, sin cambios rastreados).
+- `python3 -m scripts.init_env` generó `.env` y `.env.demo` locales; no se copiaron ni registraron valores secretos.
+- Se eligieron nombres Compose y puertos únicos para no reutilizar datos existentes. No se ejecutó `down -v` ni se modificaron o detuvieron volúmenes previos.
+
+## Arranque siguiendo README
+
+En el clone limpio, se siguió el procedimiento de **Arranque local** del README con `SOUNDGRAPH_API_PORT=18140` y proyecto `soundgraph-final-20261128`: iniciar PostgreSQL/MongoDB/Neo4j con `--wait`, construir `tools` y `api`, ejecutar el cargador, ejecutar `scripts.check_references` y subir la API.
+
+- Motores: PostgreSQL 17.12, MongoDB 8.0.38, Neo4j 5.26.33.
+- Carga: semilla verificada, sin referencias huérfanas.
+- Auditoría: «Referencias entre motores: sin incidencias.»
+- `GET http://127.0.0.1:18140/health/ready`: `200 {"status":"ok"}`.
+- OpenAPI servido comparado estructuralmente con `docs/api/openapi.json`: igualdad, 12 paths.
+
+## Pruebas limpias según README y guía HTTP
+
+En otro proyecto Compose y volúmenes frescos, `soundgraph-clean-tests-20261128`, puerto `18141`:
+
+- `pytest ... tests/unit`: **70 aprobadas**.
+- `pytest ... tests/integration` con `SOUNDGRAPH_ISOLATED_TEST=1`: **21 aprobadas**.
+- Auditoría final: sin incidencias.
+- Suite HTTP: **11/11 aprobadas** (registro completo debajo).
+
+La prueba HTTP versionada comprueba de forma intencional que el servicio `soundgraph-test` esté publicado en `127.0.0.1:18080`. Para conservar sus aserciones sin apropiarse de ese nombre/puerto, se ejecutó una copia temporal `tests/http/test_api_clean.py`, ajustando únicamente el nombre del proyecto y el puerto a los aislados indicados. Se borró esa copia al terminar; `tests/http/test_api.py` no se modificó.
+
+```text
+test_00_same_origin_frontend (__main__.ApiTests) ... ok
+test_01_openapi_and_readiness (__main__.ApiTests) ... ok
+test_02_session_denied_cross_origin_and_revoked (__main__.ApiTests) ... ok
+test_03_recommendation_and_empty_profile (__main__.ApiTests) ... ok
+test_04_playlist_concurrency_order_and_crud (__main__.ApiTests) ... ok
+test_05_editor_updates_only_notes (__main__.ApiTests) ... ok
+test_06_partial_recommendation_and_orphan_playlist (__main__.ApiTests) ... ok
+test_07_graph_failure_is_not_empty_and_recovers (__main__.ApiTests) ... ok
+test_08_editorial_catalog_reads_and_permissions (__main__.ApiTests) ... ok
+test_09_personal_profiles_persist_relogin_and_isolate_playlists (__main__.ApiTests) ... ok
+test_10_personal_creation_survives_graph_outage_and_reconciles (__main__.ApiTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 52.678s
+
+OK
+Referencias entre motores: sin incidencias.
+```
+
+## Alcance y cautelas
+
+Es una reproducción desde un `git clone` de `main` y volúmenes nuevos; Docker reutilizó caché de imagen, no volúmenes. Los proyectos `soundgraph-final-20261128` y `soundgraph-clean-tests-20261128` quedaron en ejecución para conservar el estado de demostración y prueba. La suite HTTP detiene/reinicia únicamente Neo4j del proyecto de prueba y restaura la ficha Mongo temporal. Los valores de `.env` siguen locales y excluidos de Git.
