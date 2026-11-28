@@ -48,4 +48,4 @@ Además de la guía del proyecto se encontró la guía instructiva del cartel ET
 - La verificación móvil se omite por decisión del usuario: el alcance actual está enfocado en el desarrollo web.
 - Confirmar con el equipo que el código `fb24f00` publicado en `main` es la versión de presentación acordada y realizar el ensayo con el equipo/docente en el entorno físico de presentación.
 - Si se añaden cambios de código o configuración, repetir las pruebas afectadas y vincular los resultados al commit definitivo.
-- No se verificaron visualmente todos los controles de gestión de playlist; varias de esas operaciones sí están cubiertas por H04 en HTTP. El ensayo visual de demo comprueba el flujo principal de recomendación, ficha y guardado, no toda la matriz de controles.
+- Al cierre original del 27/11 no se habían verificado visualmente todos los controles de gestión. La eliminación se confirmó posteriormente el 28/11 en [UI-05](2026-11-28-demo-delete-web.log); los recorridos posteriores y sus límites están en el [seguimiento vigente](../seguimiento-cierre.md). Esto no implica cobertura visual exhaustiva de todas las entradas y errores.

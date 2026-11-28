@@ -1,6 +1,6 @@
 # SoundGraph — Catálogo de operaciones y consultas
 
-**Alcance:** operaciones de la versión actual. Los cuerpos completos y tipos se encuentran en [OpenAPI](api/openapi.json). Las rutas de negocio llevan el prefijo `/api/v1`; las protegidas requieren una sesión de demo. **PG** = PostgreSQL, **MG** = MongoDB, **NG** = Neo4j. Las respuestas de error tienen código y mensaje; un estado que aparece en «límites y errores» no se considera probado salvo que la columna de evidencia lo indique.
+**Alcance:** operaciones de la versión actual. Los cuerpos completos y tipos se encuentran en [OpenAPI](api/openapi.json). Las rutas de negocio llevan el prefijo `/api/v1`; las protegidas requieren una sesión válida, personal o de demostración. **PG** = PostgreSQL, **MG** = MongoDB, **NG** = Neo4j. Las respuestas de error tienen código y mensaje; un estado que aparece en «límites y errores» no se considera probado salvo que la columna de evidencia lo indique.
 
 **Cómo leer la evidencia:** H01–H10 identifican pruebas de la suite HTTP ejecutada en la candidata; H11 es un sondeo HTTP adicional. UI-01 a UI-05 identifican recorridos visuales de escritorio. Las pruebas no implican cobertura exhaustiva de toda combinación de datos. Las expresiones «previsto», «implementado» o «no se verificó» describen el contrato o el código, no una prueba aprobada de ese caso. Los resultados por ejecución y revisión se separan en el [índice de entregables](entregables.md#cómo-leer-las-evidencias).
 
