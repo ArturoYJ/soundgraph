@@ -11,7 +11,7 @@ La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidat
 | ID · propósito | Ruta · motores | Entrada y validación | Salida esperada | Límites, errores y evidencia observada |
 | --- | --- | --- | --- | --- |
 | S-04 · crear perfil personal | `POST /profiles` · PG + NG | `displayName` de 1–100 caracteres; no admite rol ni ID | `201`, perfil oyente, código personal y cookie | Fallo de grafo tras confirmar SQL deja `graphPending: true`, reintentable. |
-| S-05 · entrar con código personal | `POST /sessions` · PG + NG si pendiente | `code` completo generado al crear | `201`, perfil y cookie | Código incorrecto → `401`; reconcilia el nodo pendiente sin cambiar identidad. |
+| S-05 · entrar con código personal | `POST /sessions` · PG + NG si pendiente | `code` completo generado al crear | `201`, perfil y cookie | Código incorrecto → `401`; reconcilia el nodo pendiente sin cambiar identidad. H09 HTTP y UI-02: alta, cierre, reingreso visual con el código y perfil recuperado. |
 | S-00 · comprobar dependencias | `GET /health/ready` (sin prefijo) · PG + MG + NG | Sin entrada | `200`, `{"status":"ok"}` | Comprueba también la consulta real de recomendación. H07 exige primera recomendación correcta tras reiniciar Neo4j. |
 | S-01 · iniciar sesión | `POST /demo/sessions` · PG | `profileId` válido y `code` de 1–128 caracteres; credenciales correctas | `201`, perfil y cookie HttpOnly/SameSite Strict | H02: código incorrecto → `401`; sesiones válidas emitidas en la suite. Códigos solo locales. |
 | S-02 · recuperar sesión | `GET /demo/sessions/current` · PG | Cookie y sesión vigente | `200`, `{profileId, displayName, role}` | H02: perfil válido; la revocación del token se comprobó en una ruta protegida distinta. |
@@ -33,7 +33,7 @@ La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidat
 
 ## Consultas representativas por motor
 
-Las nuevas operaciones de perfiles se verifican en H09 (identidad, acceso posterior y separación de playlists) y H10 (alta durante caída del grafo y reconciliación). La [evidencia del 23 de noviembre](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra también la reproducción y corrección de H07 sin alterar su aserción.
+Las nuevas operaciones de perfiles se verifican en H09 (identidad, acceso posterior y separación de playlists) y H10 (alta durante caída del grafo y reconciliación); UI-02 agrega el recorrido visual de reingreso con código y confirma que vuelve el mismo perfil. La [evidencia del 23 de noviembre](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra también la reproducción y corrección de H07 sin alterar su aserción.
 
 Se ejecutaron en el entorno aislado `soundgraph-bench` con la semilla sin pistas guardadas. Las dos primeras son lecturas representativas; la tercera usa literalmente el archivo Cypher del integrador.
 
