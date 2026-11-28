@@ -1,0 +1,27 @@
+# Requisitos adicionales de ETEIA para el cartel — 27 de noviembre de 2026
+
+## Material consultado
+
+Se revisó visualmente el PDF de dos páginas **Guía instructiva para la elaboración del póster**, del Encuentro de Tecnologías Emergentes e Innovación Aplicada (ETEIA), junto con el cartel PDF de SoundGraph disponible en Descargas. La guía del proyecto final sigue siendo el contrato para la aplicación y sus ocho entregables; el cartel es un producto de comunicación derivado, no sustituye código, modelos, scripts, pruebas ni documentación.
+
+## Criterios extraídos de la guía del cartel
+
+- El cartel comunica problema, decisiones de diseño/implementación, resultados demostrables y conclusiones respaldadas; no debe inventar resultados ni crear una versión alternativa del proyecto para el cartel.
+- La estructura enumera: título específico; autores completos; afiliaciones; resumen; introducción; planteamiento del problema; justificación; metodología; resultados; conclusiones con límites/mejoras; referencias IEEE.
+- Los resultados deben distinguir lo diseñado, implementado y validado. Mostrar responsabilidades y operaciones de las tres bases; dar contexto/procedimiento a pruebas y mediciones; declarar lo incompleto.
+- Formato recomendado: A1 vertical, 60 × 90 cm, salvo instrucción distinta de la organización. El PDF final debe usar las dimensiones indicadas por la organización.
+- Exposición oral de 5–7 minutos seguida de preguntas; añadir demostración breve cuando esté disponible.
+- El QR puede apuntar al repositorio, demo o ficha digital; se debe comprobar que abre antes de entregar el cartel.
+
+## Revisión del cartel disponible
+
+- PDF de una página, 1700 × 2551 pt (≈ 59,97 × 89,99 cm), compatible con 60 × 90 cm vertical.
+- Incluye título, autores, afiliación, resumen, contexto, justificación, metodología, resultados, conclusiones y referencias; muestra un QR de repositorio.
+- El QR se decodificó como `https://github.com/ArturoYJ/soundgraph`; la URL respondió HTTP 200 el 27/11/2026. Repetir la comprobación si cambia la URL/QR y antes de imprimir o entregar.
+- La guía pide referencias IEEE; en el cartel actual [4] y [5] aparecen pegadas en una misma línea y la referencia [9] «Evaluacion ampliada… Registros locales y muestras» no ofrece una ubicación bibliográfica reproducible. Corregir y revisar acentos/formato al preparar la siguiente versión.
+- El cartel no identifica el hash del código que respalda sus resultados. Las 600/600 y 24/24 ahora se reprodujeron en el candidato `fb24f00` y sus registros están en `2026-11-27-fb24f-evaluacion-ampliada.md` y JSONL. Los p95 del cartel (21,98; 125,68; 104,93 ms) proceden de la evaluación anterior sobre `b287571`, no de la nueva corrida en `fb24f00`; no presentarlos como medición de la candidata final. Actualizar las cifras y la referencia [9] con los valores actuales o etiquetar expresamente la revisión histórica. No afirmar carga concurrente: ambas mediciones son secuenciales.
+- No se editó el PDF del cartel ni se fijó la exposición. Antes de entrega, acordar con el equipo el cartel que se imprimirá y ensayar exposición, preguntas y demo breve.
+
+## Límite de la búsqueda externa
+
+La búsqueda local encontró la guía del proyecto final, esta guía del cartel, el cartel y un PDF de documentación final de SoundGraph. No se localizaron rúbrica adicional ni diapositivas en las carpetas locales consultadas. No se pudo verificar el contenido de la plataforma del curso ni una instrucción directa del profesor; confirmar allí fecha, mecanismo de entrega, dimensiones de impresión y si el cartel/demostración son obligatorios para este grupo.

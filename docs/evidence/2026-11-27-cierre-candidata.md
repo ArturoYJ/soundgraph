@@ -37,9 +37,11 @@ Se midió la versión `fb24f00` con el cliente HTTP local de `scripts/measure_de
 
 No son pruebas de carga, concurrencia, capacidad de producción, precisión musical ni satisfacción. No deben sumarse las muestras de rendimiento al conteo de pruebas funcionales.
 
+La evaluación ampliada de **600 escenarios de grafo, 24 de API y 900 lecturas secuenciales** se volvió a ejecutar sobre `fb24f00` en otro entorno aislado con volúmenes nuevos; sus p95 difieren de los que aparecen en el cartel anterior. Consulta [registro actual, métricas y hashes](2026-11-27-fb24f-evaluacion-ampliada.md) antes de usar cifras en la exposición.
+
 ## Revisión de materiales adicionales disponibles
 
-En la carpeta del curso solo se localizaron la guía del proyecto final ya revisada y un PDF de cartel del proyecto. No se encontraron diapositivas ni rúbrica adicional dentro del repositorio ni archivos con indicios del proyecto en la raíz de Descargas. El cartel existente presenta resultados y mediciones de una evaluación previa; no constituye una rúbrica ni fija instrucciones para la aplicación web. Si ese cartel se entregará junto con la app, sus cifras deben reconciliarse con el commit final y la exigencia de QR/repositorio debe confirmarse con el equipo/docente. Esta búsqueda local no demuestra que el profesor no haya publicado otros materiales en la plataforma del curso.
+Además de la guía del proyecto se encontró la guía instructiva del cartel ETEIA y un cartel PDF. El cartel actual tiene dimensión compatible con 60 × 90 cm y su QR se decodificó; abrió el repositorio público con respuesta HTTP 200. La guía agrega requisitos de contenido, evidencia rigurosa, PDF, exposición oral de 5–7 minutos, preguntas y demostración breve si está disponible. La comparación del cartel con la guía, las cifras que deben actualizarse y los requisitos por confirmar están en [revisión del material adicional](2026-11-27-material-adicional-poster.md). No se localizaron diapositivas ni rúbrica en las carpetas locales; esto no descarta materiales en la plataforma del curso. El cartel PDF no se modificó.
 
 ## Pendientes para la entrega
 
