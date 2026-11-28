@@ -17,4 +17,5 @@ Candidata de código: `fb24f0009da5718074d0675a3748d7db21488693`. Los documentos
 | Medición de las rutas principales | Aprobado con límites | Medición aislada sobre la base `fb24f00`, con carga de fondo no controlada. | Equipo técnico |
 | Actualizar índice, arquitectura y trazabilidad | En curso | Revisar casos del catálogo marcados previstos y confirmar el paquete tras el commit definitivo. | Equipo |
 | Versión y publicación definitivas | En curso | Evidencia/documentación publicada en `effc047` y `600e6be`; falta confirmar la versión de presentación y validar repo/QR final. | Equipo |
-| Ensayo final de presentación | Pendiente | Ensayar con datos preparados, permisos, disponibilidad y documentación de la versión definitiva. | Equipo |
+| Ensayo final de presentación | Pendiente | Ensayar con datos preparados, permisos, disponibilidad y documentación de la versión definitiva. | Equipo
+| Verificar otros materiales de curso | Parcial | La búsqueda local encontró guía y cartel PDF, no rúbrica/slides; confirmar si la plataforma del curso tiene requisitos adicionales y si el cartel integra la entrega. | Equipo |

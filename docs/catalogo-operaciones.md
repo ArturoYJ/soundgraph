@@ -2,17 +2,17 @@
 
 **Alcance:** operaciones de la versión actual. Los cuerpos completos y tipos se encuentran en [OpenAPI](api/openapi.json). Las rutas de negocio llevan el prefijo `/api/v1`; las protegidas requieren una sesión de demo. **PG** = PostgreSQL, **MG** = MongoDB, **NG** = Neo4j. Las respuestas de error tienen código y mensaje; un estado que aparece en «límites y errores» no se considera probado salvo que la columna de evidencia lo indique.
 
-**Cómo leer la evidencia:** las referencias H01–H08 identifican casos ejecutados de la suite HTTP; los recorridos de navegador y las mediciones se citan cuando corresponden. Las expresiones «previsto», «implementado» o «no se verificó» describen el contrato o el código, no una prueba aprobada de ese caso. Los resultados por ejecución y revisión se separan en el [índice de entregables](entregables.md#cómo-leer-las-evidencias).
+**Cómo leer la evidencia:** H01–H10 identifican pruebas de la suite HTTP ejecutada en la candidata; UI-01/UI-02 identifican recorridos visuales de escritorio. Las pruebas no implican cobertura exhaustiva de toda combinación de datos. Las expresiones «previsto», «implementado» o «no se verificó» describen el contrato o el código, no una prueba aprobada de ese caso. Los resultados por ejecución y revisión se separan en el [índice de entregables](entregables.md#cómo-leer-las-evidencias).
 
-La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidata.md) ejecutó H00–H10 en el código base `fb24f00`. No convierte en probados los casos específicos que cada fila siga identificando como previstos o no verificados.
+La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidata.md) ejecutó H00–H10 sobre el código base `fb24f00`; UI-01 cubre los recorridos principales de Ana/Editor y UI-02 el reingreso con código. Esta auditoría relaciona cada endpoint con evidencia, pero no convierte en probados los casos que cada fila marque como previstos o no verificados.
 
 ## Operaciones de la aplicación
 
 | ID · propósito | Ruta · motores | Entrada y validación | Salida esperada | Límites, errores y evidencia observada |
 | --- | --- | --- | --- | --- |
-| S-04 · crear perfil personal | `POST /profiles` · PG + NG | `displayName` de 1–100 caracteres; no admite rol ni ID | `201`, perfil oyente, código personal y cookie | Fallo de grafo tras confirmar SQL deja `graphPending: true`, reintentable. |
-| S-05 · entrar con código personal | `POST /sessions` · PG + NG si pendiente | `code` completo generado al crear | `201`, perfil y cookie | Código incorrecto → `401`; reconcilia el nodo pendiente sin cambiar identidad. H09 HTTP y UI-02: alta, cierre, reingreso visual con el código y perfil recuperado. |
-| S-00 · comprobar dependencias | `GET /health/ready` (sin prefijo) · PG + MG + NG | Sin entrada | `200`, `{"status":"ok"}` | Comprueba también la consulta real de recomendación. H07 exige primera recomendación correcta tras reiniciar Neo4j. |
+| S-04 · crear perfil personal | `POST /profiles` · PG + NG | `displayName` de 1–100 caracteres; no admite rol ni ID | `201`, perfil oyente, código personal y cookie | H09 HTTP: creación, identidad aleatoria, rol listener y nodo creado. H10: alta durante fallo de Neo4j, `graphPending: true` y reconciliación. UI-02: creación visual. |
+| S-05 · entrar con código personal | `POST /sessions` · PG + NG si pendiente | `code` completo generado al crear | `201`, perfil y cookie | H09 HTTP: reingreso, misma identidad y playlist propia; código inválido → `401`. H10: reintento de perfil pendiente. UI-02: cierre y reingreso visual con el código, misma identidad en pantalla. |
+| S-00 · comprobar dependencias | `GET /health/ready` (sin prefijo) · PG + MG + NG | Sin entrada | `200`, `{"status":"ok"}` | Comprueba también la consulta real de recomendación. H01: `200` con los motores disponibles. H07: durante una caída `503`; tras reinicio, vuelve a `200` y recomienda C.R.E.A.M. |
 | S-01 · iniciar sesión | `POST /demo/sessions` · PG | `profileId` válido y `code` de 1–128 caracteres; credenciales correctas | `201`, perfil y cookie HttpOnly/SameSite Strict | H02: código incorrecto → `401`; sesiones válidas emitidas en la suite. Códigos solo locales. |
 | S-02 · recuperar sesión | `GET /demo/sessions/current` · PG | Cookie y sesión vigente | `200`, `{profileId, displayName, role}` | H02: perfil válido; la revocación del token se comprobó en una ruta protegida distinta. |
 | S-03 · cerrar sesión | `DELETE /demo/sessions/current` · PG si hay token reconocible | Cookie si está presente; origen permitido | `204`, sin cuerpo; revoca sesión y elimina cookie | H02: revocación comprobada; escribir desde un origen no permitido se rechaza con `403` (probado con creación de playlist). |
@@ -29,7 +29,34 @@ La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidat
 | E-03 · abrir ficha para editar | `GET /songs/{songId}/editorial` · PG + MG | Sesión de editor e identificador válido | `200`, ficha con título, créditos y notas | H08: fixture existente y ficticio ausente → `404`; invitado → `401`, oyente → `403`. H05: las notas actualizadas son visibles en una lectura posterior. |
 | E-01 · editar notas | `PATCH /songs/{songId}/editorial` · PG + MG | Sesión de editor; 1–20 notas, `text` de 1–1000, `source` de 1–200 tras recorte | `200`, ficha con las notas reemplazadas | H05: editor actualiza notas sin cambiar créditos ni afinidad; oyente → `403`; nota inválida → `422`. También disponible desde Editorial; no edita el título ni los créditos. |
 
-**Trazabilidad.** H01–H08 identifican `test_01` a `test_08` de la [suite HTTP](../tests/http/test_api.py). El [registro de entrega del 22 de noviembre](evidence/2026-11-22-verificacion-entrega.md#evidencia-por-tipo-de-prueba) documenta las 9 pruebas HTTP aprobadas. La [evidencia REST de H1](evidence/2026-11-21-h1-rest-api.md) describe los casos iniciales y su [evidencia en navegador](evidence/2026-11-21-h1-frontend.md) registra la recomendación, el guardado y la recarga. La [evidencia de H2](evidence/2026-11-21-h2-frontend.md) documenta la gestión de playlists, las notas y el caso H08 de lecturas y permisos editoriales. H00 verifica la entrega de los recursos frontend y no representa una operación de dominio. La [medición HTTP de la candidata](evidence/2026-11-22-verificacion-entrega.md#medición-http-de-la-versión-candidata) es una ejecución separada.
+**Trazabilidad.** H01–H10 identifican `test_01` a `test_10` de la [suite HTTP](../tests/http/test_api.py); H00 es la prueba de entrega de frontend. El [registro del 27 de noviembre](evidence/2026-11-27-cierre-http.log) conserva los 11 resultados, incluidos H09–H10. La evidencia antigua del 22 de noviembre corresponde a otra versión y se mantiene solo como antecedente. UI-01 y UI-02 están descritos en el [registro de cierre](evidence/2026-11-27-cierre-candidata.md). H00 verifica la entrega de recursos frontend y no representa una operación de dominio. La [medición HTTP de la candidata](evidence/2026-11-27-cierre-candidata.md#medición-http) es una ejecución separada, no una prueba funcional adicional.
+
+## Auditoría endpoint por endpoint — candidata `fb24f00`
+
+La comprobación cotejó las 18 rutas de `docs/api/openapi.json` con las aserciones de H01–H10, la evidencia de navegador y el registro de medición. «Cubierto» significa que hay al menos un resultado observable de la operación, no que todas las entradas y fallas estén probadas.
+
+| Operación | Evidencia de resultado | Límite que permanece explícito |
+| --- | --- | --- |
+| `GET /health/ready` | H01 disponible; H07 indisponibilidad y recuperación. | Ninguno para los escenarios reportados; no prueba todas las combinaciones de fallos. |
+| `POST /demo/sessions` | H02 acceso correcto e inválido. | No evalúa fuerza contra ataques; demo local. |
+| `GET /demo/sessions/current` | H02 perfil autenticado; H09 identidad personal. | La autenticación de producción está fuera del alcance. |
+| `DELETE /demo/sessions/current` | H02 cierre y revocación; H09 reingreso personal posterior. | El logout sin cookie reconocible no se separó como caso autónomo. |
+| `POST /profiles` | H09 creación/validación; H10 fallo de Neo4j y reconciliación; UI-02 alta web. | Sin transacción distribuida; resultado pendiente se comunica mediante `graphPending`. |
+| `POST /sessions` | H09 código válido/inválido; UI-02 reingreso web. | Se probó el flujo de código de demo generado, no políticas de rotación/recuperación de credenciales. |
+| `GET /recommendations` | H03 escenario base/vacío; H06 ficha ausente; H07 caída; escenarios Neo4j y API adicionales. | No evalúa relevancia musical ni usuarios reales. |
+| `GET /playlists` | Medición 100/100 con lista de Ana; H09 lista propia tras reingreso. | El caso HTTP de lista vacía está probado indirectamente para perfil nuevo al verificar aislamiento; rendimiento no es cobertura adicional. |
+| `POST /playlists` | H04 alta y limpieza; UI-01 creación visual. | El `422` por nombre inválido se describe como previsto por esquema, no como aserción HTTP específica. |
+| `GET /playlists/{playlistId}` | H03 acceso ajeno; H04 orden/detalle; H06 ficha ausente. | Combinaciones arbitrarias de IDs no se enumeraron exhaustivamente. |
+| `PATCH /playlists/{playlistId}` | H04 renombre y recorte; H09 denegación de playlist ajena. | No hay caso HTTP separado de nombre vacío; validación se infiere del esquema y código. |
+| `DELETE /playlists/{playlistId}` | H04 eliminación; H09 denegación de playlist ajena. | No se afirma borrado en motores distintos de PostgreSQL. |
+| `PUT /playlists/{playlistId}/tracks/{songId}` | H04 concurrencia/duplicado; H03 ajena; H06 ficha ausente; UI-01 guardado y recarga. | No se midieron todas las carreras posibles. |
+| `DELETE /playlists/{playlistId}/tracks/{songId}` | H04 quitar y compactar posiciones; H09 ajena. | La retirada de una pista inexistente en lista propia está implementada como idempotente, pero no se probó por separado. |
+| `PUT /playlists/{playlistId}/track-order` | H04 permutación válida y orden incompleto rechazado sin cambios; H09 ajena. | No prueba cada límite de tamaño ni todos los órdenes posibles. |
+| `GET /songs` | H08 paginación, límite, invitado y rol oyente. | No prueba límites de cursor vacíos o toda página posible. |
+| `GET /songs/{songId}/editorial` | H08 ficha válida/ausente y permisos; UI-01 lectura durante edición. | No enumera todas las fichas. |
+| `PATCH /songs/{songId}/editorial` | H05 nota válida/inválida, preservación de créditos y afinidad; UI-01 guardar, recargar y restaurar. | No implementa control de concurrencia entre editores; última escritura prevalece. |
+
+La matriz no convierte los límites listados en fallos de cumplimiento automáticamente: distingue cobertura observada de escenarios no probados. La guía no fija un número mínimo de pruebas ni cobertura porcentual. Las nuevas pruebas solo se agregarán si el docente exige esos escenarios o si se descubre un defecto/riesgo que afecte el alcance.
 
 ## Consultas representativas por motor
 
