@@ -12,6 +12,12 @@ Sigue el [arranque local](../README.md#arranque-local), abre [SoundGraph](http:/
 
 La primera vez solo se mostrará **Guardada** si la pista aún no estaba en la lista. Si el entorno ya se usó para ensayar, emplea una playlist temporal para demostrar el alta sin alterar una lista existente.
 
+## Perfil personal y recuperación de acceso
+
+Para demostrar el acceso personal en la app web, selecciona **Crear perfil**, registra un nombre de prueba y crea el perfil. Guarda el código generado en un lugar privado antes de cerrar el diálogo: la app solo lo muestra una vez. Cierra la sesión, selecciona **Mi código**, introduce el código completo y vuelve a entrar. Comprueba que aparece el mismo nombre y que sus playlists siguen siendo propias. Un perfil nuevo no tiene historial de escucha, por lo que es normal que todavía no reciba recomendaciones; usa Ana para demostrar el cálculo con datos de semilla.
+
+No registres códigos en capturas, cartel, repositorio o logs. La prueba visual de referencia se realizó con un perfil desechable en el Compose aislado y después se retiró de ese entorno.
+
 ## Preparación previa de gestión
 
 Antes de presentar, entra como Ana y crea una playlist temporal en **Mis playlists**. Desde **Descubrir**, guarda «C.R.E.A.M.» en ella. Para añadir la segunda canción de la semilla:

@@ -1,6 +1,6 @@
 # SoundGraph — Índice de entregables
 
-Este es el índice vigente del integrador. Cada entregable enlaza su artefacto y, cuando corresponde, la evidencia de ejecución. El plan y el diseño del MVP se conservan como antecedentes de trabajo.
+Este es el índice de entregables de la candidata de código `fb24f00`; los documentos de cierre se publicaron posteriormente hasta `9324596`. Cada entregable enlaza su artefacto y, cuando corresponde, evidencia de ejecución. El plan y diseño del MVP se conservan como antecedentes de trabajo.
 
 La [actualización local de perfiles personales, recuperación de Neo4j e interfaz](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra las pruebas afectadas y el pendiente de revisión visual móvil; sus resultados se separan de las ejecuciones históricas siguientes.
 
@@ -18,6 +18,8 @@ La [actualización local de perfiles personales, recuperación de Neo4j e interf
 El **cartel final y el QR** se entregan por separado. El QR debe apuntar al repositorio y probarse antes de entregar el cartel. La evidencia del integrador está en texto, código y datos de prueba; las capturas se conservan fuera de la selección pública.
 
 [Matriz de seguimiento y pendientes del cierre](seguimiento-cierre.md).
+
+La [reproducibilidad desde README](evidence/2026-11-27-reproducibilidad.log), la [suite HTTP en el entorno limpio](evidence/2026-11-27-repro-http.log) y la [auditoría endpoint por endpoint](catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00) complementan la verificación. La [matriz de seguimiento](seguimiento-cierre.md) identifica lo aún pendiente.
 
 ## Validación de la candidata del 27 de noviembre
 

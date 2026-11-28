@@ -89,6 +89,7 @@ La [guía de la API](docs/api/README.md) tiene la prueba HTTP aislada, incluidos
 - [Qué usa cada base y cuándo intervienen los archivos del proyecto](docs/mapa-del-proyecto.md)
 - [Catálogo de operaciones y consultas](docs/catalogo-operaciones.md)
 - [Validación de entrega y medición HTTP del 22 de noviembre](docs/evidence/2026-11-22-verificacion-entrega.md)
+- [Cierre de candidata, reproducibilidad y pruebas actualizadas](docs/evidence/2026-11-27-cierre-candidata.md) · [índice de entregables](docs/entregables.md) · [pendientes de cierre](docs/seguimiento-cierre.md)
 - [Verificación en navegador: descubrimiento y guardado](docs/evidence/2026-11-21-h1-frontend.md) y [gestión de playlists y notas](docs/evidence/2026-11-21-h2-frontend.md)
 
 **Documentos históricos de trabajo:** [diseño del MVP](docs/superpowers/specs/2026-11-21-soundgraph-mvp-design.md) y [plan de implementación](docs/superpowers/plans/2026-11-21-soundgraph-mvp-implementation.md). Para conocer lo implementado y probado, usa el índice vigente.
