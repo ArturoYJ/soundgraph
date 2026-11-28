@@ -16,6 +16,7 @@ En el clone limpio, se siguió el procedimiento de **Arranque local** del README
 - Auditoría: «Referencias entre motores: sin incidencias.»
 - `GET http://127.0.0.1:18140/health/ready`: `200 {"status":"ok"}`.
 - OpenAPI servido comparado estructuralmente con `docs/api/openapi.json`: igualdad, 12 paths.
+- En Chrome, la raíz de la aplicación mostró la pantalla **Acceso** del clone limpio, con las opciones «Crear perfil», «Mi código» y «Demo / Editor». No se ingresó ningún código/credencial ni se mutaron datos durante este smoke visual.
 
 ## Pruebas limpias según README y guía HTTP
 
