@@ -1,0 +1,14 @@
+# Recorrido web: código personal inválido — 28 de noviembre de 2026
+
+## Entorno
+
+Chrome, aplicación local `http://127.0.0.1:18138`, proyecto Compose aislado `soundgraph-repro-20261127`. Se usó una pestaña nueva tras cerrar la sesión anterior; la API comprobó la sesión como no autenticada (`GET /api/v1/demo/sessions/current` → `401`). No se usaron códigos de perfiles reales ni se alteraron datos.
+
+## Pasos y resultado
+
+1. En la pantalla **Acceso**, se seleccionó **Mi código**.
+2. Se introdujo el valor sintético `codigo-invalido-para-prueba` y se envió el formulario.
+3. La API respondió `POST /api/v1/sessions` → `401 Unauthorized`.
+4. La vista mantuvo el acceso personal, no autenticó al usuario y mostró el mensaje «El código personal no es válido. Revisa que esté completo.»
+
+**Resultado:** aprobado para este caso negativo del flujo web. No se guardó el valor sintético; no es una credencial. No demuestra protección contra intentos repetidos ni todos los estados de fallo.
