@@ -129,3 +129,5 @@ $ docker compose -p soundgraph-repro-20261127 run --rm --no-deps -e SOUNDGRAPH_I
 91 passed in 2.05s
 $ curl -fsS http://127.0.0.1:18138/health/ready
 {"status":"ok"}
+
+Prueba HTTP adicional en la misma instalación limpia, con puerto/proyecto adaptados mediante copia temporal de `tests/http/run_cartel_isolated.py` (solo se cambiaron el nombre Compose y el puerto; el verificador de binding y aserciones quedaron intactos): `python3 tests/http/run_repro_temporal.py` → 11/11 aprobadas, 38.149 s. El archivo temporal fue retirado. Registro: `docs/evidence/2026-11-27-repro-http.log`.

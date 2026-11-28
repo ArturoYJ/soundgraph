@@ -17,6 +17,6 @@ Candidata de código: `fb24f0009da5718074d0675a3748d7db21488693`. Los documentos
 | Medición de las rutas principales | Aprobado con límites | Medición aislada sobre la base `fb24f00`, con carga de fondo no controlada. | Equipo técnico |
 | Actualizar índice, arquitectura y trazabilidad | En curso | Revisar casos del catálogo marcados previstos y confirmar el paquete tras el commit definitivo. | Equipo |
 | Versión y publicación definitivas | En curso | Evidencia/documentación publicada hasta `c4c2500`; falta confirmar la versión de presentación y validar repo/QR final. | Equipo |
-| Reproducibilidad desde README | Aprobado | Entorno Compose nuevo, volúmenes vacíos, carga y auditoría limpias, readiness ok y 91/91 unitarias/integración; registro de reproducibilidad. | Equipo técnico |
+| Reproducibilidad desde README | Aprobado | Entorno Compose nuevo, volúmenes vacíos, carga y auditoría limpias, readiness ok y 91/91 unitarias/integración y 11/11 HTTP; registros de reproducibilidad. | Equipo técnico |
 | Ensayo final de presentación | Pendiente | Ensayar con datos preparados, permisos, disponibilidad y documentación de la versión definitiva. | Equipo |
 | Verificar otros materiales de curso | Parcial | La búsqueda local encontró guía y cartel PDF, no rúbrica/slides; confirmar si la plataforma del curso tiene requisitos adicionales y si el cartel integra la entrega. | Equipo |

@@ -23,7 +23,7 @@ La interrupción de carga inicial se repitió el 27 de noviembre en el mismo pro
 
 ## Reproducibilidad según README
 
-Se creó el proyecto Compose nuevo `soundgraph-repro-20261127` con volúmenes vacíos y puerto loopback 18138. Se siguieron, en ese orden, generación/verificación de configuración local, inicio de los tres motores, build de `tools` y `api`, carga semilla, auditoría de referencias e inicio de la API. La carga y auditoría terminaron sin incidencias; `/health/ready` devolvió `{"status":"ok"}`. Después, la suite unitaria y de integración ejecutada en ese entorno recién creado aprobó **91/91**. La secuencia y salidas están en [registro de reproducibilidad](2026-11-27-reproducibilidad.log). El comando `init_env` encontró los archivos `.env` privados ya generados en la copia; no los sobrescribió. Los volúmenes fueron nuevos e independientes de los demás proyectos Compose.
+Se creó el proyecto Compose nuevo `soundgraph-repro-20261127` con volúmenes vacíos y puerto loopback 18138. Se siguieron, en ese orden, generación/verificación de configuración local, inicio de los tres motores, build de `tools` y `api`, carga semilla, auditoría de referencias e inicio de la API. La carga y auditoría terminaron sin incidencias; `/health/ready` devolvió `{"status":"ok"}`. Después, la suite unitaria y de integración aprobó **91/91**, y la suite HTTP aprobó **11/11** en ese mismo entorno recién creado. Los registros están en [reproducibilidad](2026-11-27-reproducibilidad.log) y [suite HTTP](2026-11-27-repro-http.log). El comando `init_env` encontró los archivos `.env` privados ya generados en la copia; no los sobrescribió. Los volúmenes fueron nuevos e independientes de los demás proyectos Compose.
 
 ## Medición HTTP
 
