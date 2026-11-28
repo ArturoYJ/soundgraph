@@ -12,9 +12,9 @@ Candidata de código: `fb24f0009da5718074d0675a3748d7db21488693`. Los documentos
 | Fallo y reconciliación de perfil | Aprobado | H10 con caída de Neo4j en entorno aislado. | Equipo técnico |
 | Interrupción y recuperación de carga inicial | Aprobado con límites | Repetida en MongoDB caído; recuperada por reintento normal y auditoría limpia. | Equipo técnico |
 | Recorrido de Ana y edición editorial | Aprobado con límites | Ensayo de navegador de escritorio, incluyendo recarga; detalle y exclusiones en registro. | Equipo |
-| Recuperar perfil personal por código desde la interfaz | Aprobado | Perfil de prueba creado, sesión cerrada y reingreso visual por «Mi código»; identidad confirmada en pantalla. | Equipo |
+| Recuperar perfil personal por código desde la interfaz | Aprobado | Perfil de prueba creado, sesión cerrada y reingreso visual por «Mi código»; identidad confirmada en pantalla. Perfil desechable retirado de la base aislada. | Equipo |
 | Revisión móvil y teléfono físico | Fuera del alcance actual | El usuario pidió enfocar el cierre en la aplicación web y omitir móvil. | Equipo |
 | Medición de las rutas principales | Aprobado con límites | Medición aislada sobre la base `fb24f00`, con carga de fondo no controlada. | Equipo técnico |
 | Actualizar índice, arquitectura y trazabilidad | En curso | Revisar casos del catálogo marcados previstos y confirmar el paquete tras el commit definitivo. | Equipo |
-| Versión y publicación definitivas | Pendiente | Acordar con el equipo, integrar documentación, registrar commit y verificar repositorio o QR. No hubo publicación. | Equipo |
+| Versión y publicación definitivas | En curso | Evidencia/documentación publicada en `effc047` y `600e6be`; falta confirmar la versión de presentación y validar repo/QR final. | Equipo |
 | Ensayo final de presentación | Pendiente | Ensayar con datos preparados, permisos, disponibilidad y documentación de la versión definitiva. | Equipo |

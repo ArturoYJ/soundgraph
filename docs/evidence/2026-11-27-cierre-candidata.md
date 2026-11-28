@@ -2,7 +2,7 @@
 
 ## Versión y límites
 
-Código de la aplicación y pruebas del commit base `fb24f0009da5718074d0675a3748d7db21488693`, copia aislada. Este documento y los cambios de documentación se añadieron después de la ejecución; no se ha creado un commit de entrega ni publicado esta copia. La referencia `origin/main` se actualizó antes de seleccionarlo. El repositorio de desarrollo se conservó sin actualizar y sus archivos no rastreados se respaldaron fuera de esta copia.
+Código de la aplicación y pruebas del commit base `fb24f0009da5718074d0675a3748d7db21488693`, copia aislada. La evidencia de ejecución se añadió después y se publicó en `main` en los commits `effc047` y `600e6be`; el código de aplicación sigue siendo el del commit base `fb24f00`. La referencia `origin/main` se actualizó antes de seleccionarlo. El repositorio de desarrollo local se conservó sin actualizar y sus archivos no rastreados se respaldaron fuera de esta copia.
 
 Entorno: macOS 26.7.4, Apple M1, 8 GiB RAM; Docker Engine 29.1.3; proyecto Compose aislado `soundgraph-cierre-20261127`, API en `127.0.0.1:18137` y volúmenes propios nuevos. PostgreSQL 17.12, MongoDB 8.0.38 y Neo4j 5.26.33 Community. La semilla tenía 4 perfiles, 1 playlist vacía, 3 fichas y 5 escuchas. No se usaron los volúmenes de desarrollo.
 
@@ -35,6 +35,6 @@ No son pruebas de carga, concurrencia, capacidad de producción, precisión musi
 ## Pendientes para la entrega
 
 - La verificación móvil se omite por decisión del usuario: el alcance actual está enfocado en el desarrollo web.
-- Ensayar en el entorno de presentación y comprobar que la versión publicada es la acordada por el equipo; el push a `main` aún no se ha realizado.
+- Confirmar con el equipo que el código `fb24f00` publicado en `main` es la versión de presentación acordada y ensayar en el entorno de presentación.
 - Si se añaden cambios de código o configuración, repetir las pruebas afectadas y vincular los resultados al commit definitivo.
 - No se verificaron visualmente todos los controles de gestión de playlist; varias de esas operaciones sí están cubiertas por H04 en HTTP.
