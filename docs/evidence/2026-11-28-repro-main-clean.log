@@ -51,4 +51,4 @@ Referencias entre motores: sin incidencias.
 
 ## Alcance y cautelas
 
-Es una reproducción desde un `git clone` de `main` y volúmenes nuevos; Docker reutilizó caché de imagen, no volúmenes. Los proyectos `soundgraph-final-20261128` y `soundgraph-clean-tests-20261128` quedaron en ejecución para conservar el estado de demostración y prueba. La suite HTTP detiene/reinicia únicamente Neo4j del proyecto de prueba y restaura la ficha Mongo temporal. Los valores de `.env` siguen locales y excluidos de Git.
+Es una reproducción desde un `git clone` de `main` y volúmenes nuevos; Docker reutilizó caché de imagen, no volúmenes. Tras las pruebas se detuvo `soundgraph-clean-tests-20261128` mediante `docker compose down` (sin `-v`); se comprobaron sus tres volúmenes preservados. El proyecto de demo `soundgraph-final-20261128` permanece saludable en `127.0.0.1:18140`. La suite HTTP detiene/reinicia únicamente Neo4j del proyecto de prueba y restaura la ficha Mongo temporal. Los valores de `.env` siguen locales y excluidos de Git.
