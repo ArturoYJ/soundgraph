@@ -1,0 +1,9 @@
+Fallo esperado: MongoDB no disponible después de la escritura PostgreSQL.
+Perfiles PostgreSQL luego del fallo: 5
+
+Interpretación: hay un perfil adicional creado previamente en la demo web; no se esperaba que el conteo global fuera 4. La semilla es aditiva y debe conservarlo.
+PostgreSQL 17.12 (Debian 17.12-1.pgdg12+1) · MongoDB 8.0.38 · Neo4j 5.26.33 (community)
+Semilla de SoundGraph verificada: sin referencias huérfanas.
+Referencias entre motores: sin incidencias.
+Perfiles finales: 5
+Perfiles personales pendientes: 0

@@ -4,6 +4,8 @@
 
 **Cómo leer la evidencia:** las referencias H01–H08 identifican casos ejecutados de la suite HTTP; los recorridos de navegador y las mediciones se citan cuando corresponden. Las expresiones «previsto», «implementado» o «no se verificó» describen el contrato o el código, no una prueba aprobada de ese caso. Los resultados por ejecución y revisión se separan en el [índice de entregables](entregables.md#cómo-leer-las-evidencias).
 
+La [validación aislada del 27 de noviembre](evidence/2026-11-27-cierre-candidata.md) ejecutó H00–H10 en el código base `fb24f00`. No convierte en probados los casos específicos que cada fila siga identificando como previstos o no verificados.
+
 ## Operaciones de la aplicación
 
 | ID · propósito | Ruta · motores | Entrada y validación | Salida esperada | Límites, errores y evidencia observada |

@@ -17,6 +17,12 @@ La [actualización local de perfiles personales, recuperación de Neo4j e interf
 
 El **cartel final y el QR** se entregan por separado. El QR debe apuntar al repositorio y probarse antes de entregar el cartel. La evidencia del integrador está en texto, código y datos de prueba; las capturas se conservan fuera de la selección pública.
 
+[Matriz de seguimiento y pendientes del cierre](seguimiento-cierre.md).
+
+## Validación de la candidata del 27 de noviembre
+
+La [validación aislada de `fb24f00`](evidence/2026-11-27-cierre-candidata.md) documenta carga desde cero, pruebas, auditoría, medición y ensayo parcial de interfaz. Sus límites y pendientes se registran allí; el documento y el índice se añadieron después de ejecutar las pruebas y no constituyen una publicación.
+
 ## Cómo leer las evidencias
 
 Cada fila identifica una ejecución distinta. No se suman pruebas de ejecuciones diferentes; los registros históricos se conservan para poder contrastar versión, entorno y resultados.

@@ -70,4 +70,8 @@ Las referencias entre motores son **lógicas**, no claves foráneas distribuidas
 
 Al recomendar, PostgreSQL valida la sesión, Neo4j busca candidatos y MongoDB devuelve las fichas en bloque. Si falta una ficha, se omite esa recomendación y se indica resultado parcial; si un motor necesario no está disponible, la API reporta indisponibilidad en lugar de presentar una lista vacía. Al guardar se verifica la ficha, pero la única escritura es la de la playlist en PostgreSQL. Editar una nota escribe solo en MongoDB. No hay confirmación ni reversión distribuida. La carga puede quedar parcial si falla una dependencia; se corrige, se repite la carga y se ejecuta la auditoría de referencias.
 
+### Alta personal y fallo del grafo
+
+En la versión con perfiles personales, PostgreSQL confirma el perfil, el acceso y la sesión; después se intenta crear el nodo de Neo4j. Si esa escritura falla, `graph_pending` conserva el trabajo pendiente para reintento idempotente desde el acceso o las recomendaciones. Una respuesta de alta con `graphPending: true` no significa que ambas escrituras hayan terminado. H10 de la [validación aislada](evidence/2026-11-27-cierre-candidata.md) ejercitó la caída y reconciliación. No existe una transacción distribuida.
+
 [Modelo y diccionario](models/modelado-integrado.md) · [Catálogo y resultados](catalogo-operaciones.md).
