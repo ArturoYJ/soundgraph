@@ -1,6 +1,6 @@
 # SoundGraph — Índice de entregables
 
-Este es el índice de entregables de la candidata de código `fb24f00`; los documentos de cierre se publicaron posteriormente hasta `9324596`. Cada entregable enlaza su artefacto y, cuando corresponde, evidencia de ejecución. El plan y diseño del MVP se conservan como antecedentes de trabajo.
+Este es el índice de entregables de la candidata de código `fb24f00`; los commits posteriores en `main` agregan documentación y evidencia, no cambian ese código candidato. Cada entregable enlaza su artefacto y, cuando corresponde, evidencia de ejecución. El plan y diseño del MVP se conservan como antecedentes de trabajo.
 
 La [actualización local de perfiles personales, recuperación de Neo4j e interfaz](evidence/2026-11-23-perfiles-recuperacion-ui.md) registra las pruebas afectadas y el pendiente de revisión visual móvil; sus resultados se separan de las ejecuciones históricas siguientes.
 
@@ -19,7 +19,7 @@ El **cartel final y el QR** se entregan por separado. El QR debe apuntar al repo
 
 [Matriz de seguimiento y pendientes del cierre](seguimiento-cierre.md).
 
-La [reproducibilidad desde README](evidence/2026-11-27-reproducibilidad.log), la [suite HTTP en el entorno limpio](evidence/2026-11-27-repro-http.log) y la [auditoría endpoint por endpoint](catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00) complementan la verificación. La [matriz de seguimiento](seguimiento-cierre.md) identifica lo aún pendiente.
+La [reproducibilidad desde README](evidence/2026-11-27-reproducibilidad.log), la [suite HTTP en el entorno limpio](evidence/2026-11-27-repro-http.log), el [ensayo final de demo web](evidence/2026-11-27-demo-web.log) y la [auditoría endpoint por endpoint](catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00) complementan la verificación. La [matriz de seguimiento](seguimiento-cierre.md) identifica lo aún pendiente.
 
 ## Validación de la candidata del 27 de noviembre
 

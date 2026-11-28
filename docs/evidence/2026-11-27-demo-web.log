@@ -1,0 +1,21 @@
+# Ensayo de demostración web — 27 de noviembre de 2026
+
+## Alcance
+
+Ensayo visual complementario sobre el entorno limpio descrito en `2026-11-27-reproducibilidad.log`, proyecto Compose `soundgraph-repro-20261127`, API en `http://127.0.0.1:18138/`, candidato de código `fb24f0009da5718074d0675a3748d7db21488693`. Los volúmenes son propios del proyecto de reproducibilidad; no se usaron los de desarrollo. No se cambió código ni configuración.
+
+## Recorrido observado en Chrome
+
+1. Ingresó el perfil de demostración Ana.
+2. La vista **Descubrir** mostró «C.R.E.A.M.» de Wu-Tang Clan con afinidad de un perfil.
+3. **Ver ficha** abrió título, artista, nota y fuente de demostración.
+4. **Guardar en playlist** permitió seleccionar «Para escuchar» y confirmó «Guardada en Para escuchar».
+5. El enlace **Ver playlist** abrió esa lista y mostró «1 pista guardada», con «C.R.E.A.M.» visible.
+
+La lista ya contenía cero canciones antes del guardado. La playlist modificada es dato sintético del entorno aislado; quedó con una pista al terminar el ensayo. No se guarda el código de acceso en este archivo ni en capturas.
+
+## Qué demuestra y qué no
+
+Confirma el flujo visual principal de recomendación → detalle → guardado → lectura de playlist en el navegador, sobre un entorno recién reproducido. No es evidencia de calidad musical, carga, satisfacción, prueba en móvil ni cobertura visual exhaustiva de crear/renombrar/reordenar/eliminar playlists. Los ensayos previos de recuperación de perfil personal por código y edición/restauración editorial se describen en `2026-11-27-cierre-candidata.md`; no se repitieron en esta sesión de demo.
+
+La ejecución fue observada directamente en Chrome; este registro textual resume los resultados y no contiene captura de pantalla automatizada.
