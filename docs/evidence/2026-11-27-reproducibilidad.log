@@ -1,0 +1,131 @@
+$ python3 -m scripts.init_env
+.env ya existe; no se sobrescribió.
+.env.demo ya existe; no se sobrescribió.
+$ docker compose -p soundgraph-repro-20261127 up -d --wait postgres mongo neo4j
+ Network soundgraph-repro-20261127_default  Creating
+ Network soundgraph-repro-20261127_default  Created
+ Volume soundgraph-repro-20261127_mongo_data  Creating
+ Volume soundgraph-repro-20261127_mongo_data  Created
+ Volume soundgraph-repro-20261127_neo4j_data  Creating
+ Volume soundgraph-repro-20261127_neo4j_data  Created
+ Volume soundgraph-repro-20261127_postgres_data  Creating
+ Volume soundgraph-repro-20261127_postgres_data  Created
+ Container soundgraph-repro-20261127-mongo-1  Creating
+ Container soundgraph-repro-20261127-neo4j-1  Creating
+ Container soundgraph-repro-20261127-postgres-1  Creating
+ Container soundgraph-repro-20261127-mongo-1  Created
+ Container soundgraph-repro-20261127-neo4j-1  Created
+ Container soundgraph-repro-20261127-postgres-1  Created
+ Container soundgraph-repro-20261127-postgres-1  Starting
+ Container soundgraph-repro-20261127-mongo-1  Starting
+ Container soundgraph-repro-20261127-neo4j-1  Starting
+ Container soundgraph-repro-20261127-mongo-1  Started
+ Container soundgraph-repro-20261127-postgres-1  Started
+ Container soundgraph-repro-20261127-neo4j-1  Started
+ Container soundgraph-repro-20261127-mongo-1  Waiting
+ Container soundgraph-repro-20261127-neo4j-1  Waiting
+ Container soundgraph-repro-20261127-postgres-1  Waiting
+ Container soundgraph-repro-20261127-postgres-1  Healthy
+ Container soundgraph-repro-20261127-mongo-1  Healthy
+ Container soundgraph-repro-20261127-neo4j-1  Healthy
+$ docker compose -p soundgraph-repro-20261127 build tools api
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.30kB done
+#1 DONE 0.0s
+
+#2 [tools internal] load build definition from Dockerfile
+#2 transferring dockerfile: 498B done
+#2 DONE 0.0s
+
+#3 [tools internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df
+#3 ...
+
+#4 [auth] library/python:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [tools internal] load metadata for docker.io/library/python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df
+#3 DONE 5.4s
+
+#5 [api internal] load .dockerignore
+#5 transferring context: 149B done
+#5 DONE 0.0s
+
+#6 [api internal] load build context
+#6 transferring context: 2.81kB done
+#6 DONE 0.0s
+
+#7 [api 1/9] FROM docker.io/library/python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df
+#7 resolve docker.io/library/python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df 0.0s done
+#7 DONE 0.0s
+
+#8 [api 2/9] WORKDIR /app
+#8 CACHED
+
+#9 [api 5/9] COPY database/ database/
+#9 CACHED
+
+#10 [api 6/9] COPY backend/ backend/
+#10 CACHED
+
+#11 [api 7/9] COPY frontend/ frontend/
+#11 CACHED
+
+#12 [api 4/9] RUN python -m pip install --no-cache-dir -r requirements.lock.txt     && python -m pip check
+#12 CACHED
+
+#13 [api 3/9] COPY requirements.lock.txt ./
+#13 CACHED
+
+#14 [api 8/9] COPY scripts/ scripts/
+#14 CACHED
+
+#15 [api 9/9] COPY tests/ tests/
+#15 CACHED
+
+#16 [api] exporting to image
+#16 exporting layers done
+#16 exporting manifest sha256:8d4b8405ccc9a8e864aa01c71409e642ffae46d638f5426d5f65ba39de3e5f32 0.0s done
+#16 exporting config sha256:39debb28d021697a18ceb3d385f72d824a433f313ea7ce36346c10006cde1210
+#16 exporting config sha256:39debb28d021697a18ceb3d385f72d824a433f313ea7ce36346c10006cde1210 0.0s done
+#16 exporting attestation manifest sha256:ebb7e0ee4b902d22529d895f90001c3261242d08c01ca480f810e9d4b884e632 0.0s done
+#16 exporting manifest list sha256:f18aaf9149c3b185c99a7875625cd908d956cd8a0285ee06797c197cea85598a 0.0s done
+#16 naming to docker.io/library/soundgraph-repro-20261127-api:latest done
+#16 unpacking to docker.io/library/soundgraph-repro-20261127-api:latest 0.0s done
+#16 DONE 0.2s
+
+#17 [tools] exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:f388a46c0a4dc6a7bce4438624ed5f6ceddbd60cbd9f71cd848ecb08c2490c22 0.0s done
+#17 exporting config sha256:6e1e3089a62463afc57ea277eed77b464aaf9021e039e7615240b6c9180388d4 0.0s done
+#17 exporting attestation manifest sha256:05085a51f03b7e9eef20efa25ba61826292c5a8c9d98059de8a74a13677d75b7 0.0s done
+#17 exporting manifest list sha256:8baaa794c94b0ac58ee7aed48451b4c41ad131caba062ca3511eb9b494a86ace 0.0s done
+#17 naming to docker.io/library/soundgraph-repro-20261127-tools:latest done
+#17 unpacking to docker.io/library/soundgraph-repro-20261127-tools:latest 0.0s done
+#17 DONE 0.2s
+
+#18 [api] resolving provenance for metadata file
+#18 DONE 0.0s
+
+#19 [tools] resolving provenance for metadata file
+#19 DONE 0.0s
+ soundgraph-repro-20261127-tools  Built
+ soundgraph-repro-20261127-api  Built
+$ docker compose -p soundgraph-repro-20261127 run --rm --no-deps tools
+PostgreSQL 17.12 (Debian 17.12-1.pgdg12+1) · MongoDB 8.0.38 · Neo4j 5.26.33 (community)
+Semilla de SoundGraph verificada: sin referencias huérfanas.
+$ docker compose -p soundgraph-repro-20261127 run --rm --no-deps tools python -m scripts.check_references
+Referencias entre motores: sin incidencias.
+$ docker compose -p soundgraph-repro-20261127 up -d --no-deps --wait api
+ Container soundgraph-repro-20261127-api-1  Creating
+ Container soundgraph-repro-20261127-api-1  Created
+ Container soundgraph-repro-20261127-api-1  Starting
+ Container soundgraph-repro-20261127-api-1  Started
+ Container soundgraph-repro-20261127-api-1  Waiting
+ Container soundgraph-repro-20261127-api-1  Healthy
+{"status":"ok"}
+$ docker compose -p soundgraph-repro-20261127 run --rm --no-deps -e SOUNDGRAPH_ISOLATED_TEST=1 tools python -m pytest -p no:cacheprovider -q tests/unit tests/integration
+........................................................................ [ 79%]
+...................                                                      [100%]
+91 passed in 2.05s
+$ curl -fsS http://127.0.0.1:18138/health/ready
+{"status":"ok"}

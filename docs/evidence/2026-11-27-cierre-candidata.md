@@ -21,6 +21,10 @@ Entorno: macOS 26.7.4, Apple M1, 8 GiB RAM; Docker Engine 29.1.3; proyecto Compo
 
 La interrupción de carga inicial se repitió el 27 de noviembre en el mismo proyecto aislado. Se detuvo MongoDB y se invocó `seed()` directamente con PostgreSQL, MongoDB y Neo4j abiertos sin el preflight de conectividad. La escritura SQL ocurrió y la carga falló en MongoDB; se observaron 5 perfiles porque ya existía un perfil personal creado durante el ensayo web (no se asumió erróneamente que el total sería 4). Al recuperar MongoDB, el cargador normal finalizó y la auditoría quedó limpia; persistieron los 5 perfiles y no quedó ningún perfil personal con `graph_pending`. Véase [registro de interrupción y recuperación](2026-11-27-carga-interrumpida.log). Esto prueba reintento aditivo en este escenario, no atomicidad distribuida ni recuperación universal.
 
+## Reproducibilidad según README
+
+Se creó el proyecto Compose nuevo `soundgraph-repro-20261127` con volúmenes vacíos y puerto loopback 18138. Se siguieron, en ese orden, generación/verificación de configuración local, inicio de los tres motores, build de `tools` y `api`, carga semilla, auditoría de referencias e inicio de la API. La carga y auditoría terminaron sin incidencias; `/health/ready` devolvió `{"status":"ok"}`. Después, la suite unitaria y de integración ejecutada en ese entorno recién creado aprobó **91/91**. La secuencia y salidas están en [registro de reproducibilidad](2026-11-27-reproducibilidad.log). El comando `init_env` encontró los archivos `.env` privados ya generados en la copia; no los sobrescribió. Los volúmenes fueron nuevos e independientes de los demás proyectos Compose.
+
 ## Medición HTTP
 
 Se midió la versión `fb24f00` con el cliente HTTP local de `scripts/measure_demo.py`, adaptando en memoria únicamente el nombre y puerto del proyecto. Hubo 10 calentamientos y 100 solicitudes medidas secuencialmente por ruta; el cronómetro incluye la respuesta HTTP completa, pero no el renderizado. La carga de fondo no se controló, por lo que son mediciones orientativas. Las [200 muestras](2026-11-27-cierre-rendimiento.csv) tienen HTTP 200 y respuestas esperadas.
