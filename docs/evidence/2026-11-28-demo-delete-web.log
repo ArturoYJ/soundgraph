@@ -1,0 +1,18 @@
+# Recorrido web: eliminación confirmada de playlist — 28 de noviembre de 2026
+
+## Entorno y alcance
+
+Chrome en `http://127.0.0.1:18138`, proyecto Compose aislado `soundgraph-repro-20261127`, API saludable. Se usó la sesión de Ana y la playlist sintética temporal «Prueba gestión web renombrada» (`pl-d44d2b48790f4d03972cc67478a5fdf7`), creada para el ensayo anterior. No se usaron ni modificaron los volúmenes de desarrollo. La playlist era el único dato de prueba eliminado.
+
+## Pasos y resultado
+
+1. Desde **Mis playlists**, se abrió la playlist temporal correcta; la pantalla mostró C.R.E.A.M. y un tema.
+2. Se pulsó **Eliminar playlist**. El diálogo identificó explícitamente «Prueba gestión web renombrada» y explicó que solo se borraría la lista de pistas, no las canciones del catálogo.
+3. Se confirmó **Eliminar playlist**.
+4. La interfaz regresó a **Mis playlists**, mostró el mensaje «Playlist eliminada.» y la lista temporal ya no apareció. La playlist estable de Ana «Para escuchar» permaneció visible con su pista.
+
+**Resultado:** aprobado para el flujo visual de confirmación/eliminación en este caso de prueba. La evidencia se limita a esta sesión, playlist y entorno; no implica cobertura de eliminación concurrente ni de todas las fallas. H04 continúa siendo la prueba automatizada de endpoint.
+
+## Protección de datos
+
+Se eliminó únicamente la playlist temporal desechable del volumen aislado de reproducibilidad. La operación no afecta fichas/canciones del catálogo. No se registraron códigos ni credenciales. No hubo cambios de código.
