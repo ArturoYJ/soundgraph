@@ -19,7 +19,7 @@ El **cartel final y el QR** se entregan por separado. El QR debe apuntar al repo
 
 [Matriz de seguimiento y pendientes del cierre](seguimiento-cierre.md).
 
-La [reproducibilidad desde README](evidence/2026-11-27-reproducibilidad.log), la [suite HTTP en el entorno limpio](evidence/2026-11-27-repro-http.log), el [ensayo final de demo web](evidence/2026-11-27-demo-web.log) y la [auditoría endpoint por endpoint](catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00) complementan la verificación. La [matriz de seguimiento](seguimiento-cierre.md) identifica lo aún pendiente.
+La [reproducibilidad desde README](evidence/2026-11-27-reproducibilidad.log), la [suite HTTP en el entorno limpio](evidence/2026-11-27-repro-http.log), el [sondeo HTTP de casos borde](evidence/2026-11-27-catalog-edge-probes.log), el [ensayo principal de demo web](evidence/2026-11-27-demo-web.log), el [recorrido visual de gestión de playlists](evidence/2026-11-27-demo-management-web.log) y la [auditoría endpoint por endpoint](catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00) complementan la verificación. La [matriz de seguimiento](seguimiento-cierre.md) identifica lo aún pendiente.
 
 ## Validación de la candidata del 27 de noviembre
 

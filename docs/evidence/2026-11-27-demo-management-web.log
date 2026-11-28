@@ -1,0 +1,19 @@
+# Recorrido visual complementario de gestión web — 27 de noviembre de 2026
+
+## Entorno
+
+Chrome sobre la API `127.0.0.1:18138` del proyecto aislado `soundgraph-repro-20261127`. Código servido: candidato `fb24f0009da5718074d0675a3748d7db21488693`. Se usaron datos sintéticos y una playlist temporal de Ana. No se usaron los volúmenes de desarrollo ni se modificó código.
+
+## Acciones y resultados visibles
+
+1. En **Mis playlists**, crear «Prueba de gestión web» confirmó el alta y mostró 0 pistas.
+2. Abrirla y usar **Renombrar** cambió el encabezado a «Prueba gestión web renombrada».
+3. Para ejercitar reordenamiento visual, se añadieron por API local dos canciones semilla a esta playlist de prueba. La interfaz mostró C.R.E.A.M. y So What; el modal **Reordenar pistas** movió C.R.E.A.M. a la posición 2 y confirmó «Orden de las pistas actualizado».
+4. Una recarga mostró el nuevo orden persistido. Se quitó So What desde la interfaz y la lista quedó con una pista (C.R.E.A.M.). Otra recarga mantuvo el nombre y la pista.
+5. Se abrió el diálogo **¿Eliminar esta playlist?** y se canceló. No se ejecutó la eliminación ni se borraron datos del catálogo.
+
+La playlist temporal se conserva en el volumen aislado de reproducibilidad con C.R.E.A.M. como única pista. No se guardó ni registró ningún código de acceso.
+
+## Límites
+
+El recorrido verifica visualmente crear, abrir, renombrar, reordenar, retirar pista, recargar y el diálogo de confirmación de eliminar. No se confirmó la eliminación de la playlist; sí hay eliminación HTTP automatizada H04 en el catálogo. El segundo tema se agregó por API para preparar el caso de interfaz, no desde un control visual de selección de canción. No se probaron todos los errores de formulario ni todos los tamaños de lista.

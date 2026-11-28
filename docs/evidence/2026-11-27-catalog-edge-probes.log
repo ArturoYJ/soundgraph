@@ -1,0 +1,20 @@
+# Sondeo HTTP complementario de casos borde — 27 de noviembre de 2026
+
+## Identificación
+
+- Código servido: candidata `fb24f0009da5718074d0675a3748d7db21488693`.
+- Entorno: `soundgraph-repro-20261127`, API local `127.0.0.1:18138`, con volúmenes aislados.
+- Método: sondeo de la API viva con cliente HTTP Python/`urllib`, sesión de Ana para rutas protegidas. Los códigos de acceso y tokens se leyeron localmente para autenticar, no se imprimieron ni se guardaron en este registro.
+- Este sondeo no modifica el runner versionado y no se suma a las 11 pruebas automatizadas.
+
+## Resultados observados
+
+| Caso | Resultado esperado | Resultado observado | Verificación de estado |
+| --- | --- | --- | --- |
+| Cerrar sesión sin cookie | `204`, sin error | `204` | No requiere estado previo; se hizo con cliente sin cookies. |
+| `POST /playlists` con `name` compuesto solo por espacios | `422` validación | `422 invalid_input` | No se creó playlist. |
+| `PATCH /playlists/{id}` con nombre solo de espacios | `422`; mantener nombre previo | `422` | Una lectura posterior mantuvo «Cierre casos borde». |
+| Quitar `c-cream` de una playlist propia vacía | `204` idempotente | `204` | Una lectura posterior mantuvo la playlist vacía. |
+| Limpieza del fixture temporal | `204` | `204` | Se eliminó la playlist temporal creada por el sondeo. |
+
+Resultado global: **PASS**. Los casos anteriores que constaban como previstos o no verificados ahora tienen resultado observado. Siguen sin probarse todos los límites de longitud, todas las combinaciones de IDs y todas las carreras posibles; véase [auditoría del catálogo](../catalogo-operaciones.md#auditoría-endpoint-por-endpoint--candidata-fb24f00).
