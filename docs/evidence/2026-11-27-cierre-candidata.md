@@ -41,7 +41,7 @@ La evaluación ampliada de **600 escenarios de grafo, 24 de API y 900 lecturas s
 
 ## Revisión de materiales adicionales disponibles
 
-Además de la guía del proyecto se encontró la guía instructiva del cartel ETEIA y un cartel PDF. El cartel actual tiene dimensión compatible con 60 × 90 cm y su QR se decodificó; abrió el repositorio público con respuesta HTTP 200. La guía agrega requisitos de contenido, evidencia rigurosa, PDF, exposición oral de 5–7 minutos, preguntas y demostración breve si está disponible. La comparación del cartel con la guía, las cifras que deben actualizarse y los requisitos por confirmar están en [revisión del material adicional](2026-11-27-material-adicional-poster.md). No se localizaron diapositivas ni rúbrica en las carpetas locales; esto no descarta materiales en la plataforma del curso. El cartel PDF no se modificó.
+Además de la guía del proyecto se encontró la guía instructiva del cartel ETEIA, un cartel PDF y el informe consolidado `Documentacion_Final_SoundGraph.pdf` en Descargas. El cartel actual tiene dimensión compatible con 60 × 90 cm y su QR se decodificó; abrió el repositorio público con respuesta HTTP 200. La guía agrega requisitos de contenido, evidencia rigurosa, PDF, exposición oral de 5–7 minutos, preguntas y demostración breve si está disponible. La comparación del cartel, la necesidad de actualizar p95/proveniencia y el informe local no versionado están en [revisión del material adicional](2026-11-27-material-adicional-poster.md). No se localizaron diapositivas ni rúbrica en las carpetas locales; esto no descarta materiales en la plataforma del curso. Ni cartel ni informe PDF se modificaron.
 
 ## Pendientes para la entrega
 

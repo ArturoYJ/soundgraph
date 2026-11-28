@@ -17,10 +17,15 @@ Se revisó visualmente el PDF de dos páginas **Guía instructiva para la elabor
 
 - PDF de una página, 1700 × 2551 pt (≈ 59,97 × 89,99 cm), compatible con 60 × 90 cm vertical.
 - Incluye título, autores, afiliación, resumen, contexto, justificación, metodología, resultados, conclusiones y referencias; muestra un QR de repositorio.
+- El planteamiento está integrado en la introducción, pero no formula en un bloque explícito el usuario afectado, su necesidad concreta y las consecuencias del problema; reforzarlo si el cartel se revisa para entrega.
 - El QR se decodificó como `https://github.com/ArturoYJ/soundgraph`; la URL respondió HTTP 200 el 27/11/2026. Repetir la comprobación si cambia la URL/QR y antes de imprimir o entregar.
 - La guía pide referencias IEEE; en el cartel actual [4] y [5] aparecen pegadas en una misma línea y la referencia [9] «Evaluacion ampliada… Registros locales y muestras» no ofrece una ubicación bibliográfica reproducible. Corregir y revisar acentos/formato al preparar la siguiente versión.
 - El cartel no identifica el hash del código que respalda sus resultados. Las 600/600 y 24/24 ahora se reprodujeron en el candidato `fb24f00` y sus registros están en `2026-11-27-fb24f-evaluacion-ampliada.md` y JSONL. Los p95 del cartel (21,98; 125,68; 104,93 ms) proceden de la evaluación anterior sobre `b287571`, no de la nueva corrida en `fb24f00`; no presentarlos como medición de la candidata final. Actualizar las cifras y la referencia [9] con los valores actuales o etiquetar expresamente la revisión histórica. No afirmar carga concurrente: ambas mediciones son secuenciales.
 - No se editó el PDF del cartel ni se fijó la exposición. Antes de entrega, acordar con el equipo el cartel que se imprimirá y ensayar exposición, preguntas y demo breve.
+
+## Documento consolidado local
+
+También existe `Documentacion_Final_SoundGraph.pdf` en Descargas (44 páginas), que declara la revisión `fb24f00` y distingue explícitamente que las métricas del cartel se tomaron de `b287571` y no se habían repetido en la candidata. Esa nota es honesta, pero el PDF no incluye el cierre y la nueva evaluación documentados el 27/11, no está versionado en el repositorio y no se localizó un fuente editable con el mismo nombre. Si el profesor recibirá ese PDF como manual/informe, regenerarlo desde los documentos vigentes o añadir un anexo con las nuevas pruebas; no sustituirlo automáticamente sin conservar el original.
 
 ## Límite de la búsqueda externa
 
