@@ -12,6 +12,21 @@ Sigue el [arranque local](../README.md#arranque-local), abre [SoundGraph](http:/
 
 La primera vez solo se mostrará **Guardada** si la pista aún no estaba en la lista. Si el entorno ya se usó para ensayar, emplea una playlist temporal para demostrar el alta sin alterar una lista existente.
 
+## Guion oral de 5–7 minutos
+
+La guía ETEIA indica una exposición oral de 5–7 minutos, seguida de preguntas y una demostración breve si está disponible. Una distribución practicable es:
+
+| Tiempo | Qué presentar | Evidencia/idea que debe quedar clara |
+| --- | --- | --- |
+| 0:00–0:45 | Problema y alcance | Recomendación explicable basada en escuchas compartidas; la demo no predice gusto ni reproduce audio. |
+| 0:45–1:30 | Arquitectura de tres modelos | PostgreSQL: perfiles, sesiones y playlists; MongoDB: fichas/notas; Neo4j: relaciones de escucha y afinidad. No hay una transacción distribuida entre motores. |
+| 1:30–4:15 | Recorrido de Ana | Mostrar recomendación, explicación de afinidad, ficha y guardado persistente en playlist. Si el reloj apremia, priorizar este camino integrado sobre la edición editorial. |
+| 4:15–5:15 | Un flujo de gestión | Mostrar una playlist de ensayo o abrir una ya preparada y señalar renombre/orden/retirada. La eliminación solo debe hacerse a una playlist desechable de la demo. |
+| 5:15–6:15 | Validación y límites | Mencionar carga desde cero, auditoría entre motores y pruebas funcionales; las métricas secuenciales no son carga concurrente. Datos sintéticos y perfiles nuevos sin historial se explican sin exagerar. |
+| 6:15–7:00 | Cierre y preguntas | Resumir qué aporta cada modelo y qué no demuestra la evaluación (calidad musical o satisfacción real). |
+
+No es necesario ejecutar todos los recorridos en vivo: el perfil personal con código y la edición editorial son opcionales si ya se alcanzó el flujo integrado. Consulta los [resultados y limitaciones medidos en `fb24f00`](evidence/2026-11-27-fb24f-evaluacion-ampliada.md); no reutilices cifras del cartel viejo como si fueran actuales.
+
 ## Perfil personal y recuperación de acceso
 
 Para demostrar el acceso personal en la app web, selecciona **Crear perfil**, registra un nombre de prueba y crea el perfil. Guarda el código generado en un lugar privado antes de cerrar el diálogo: la app solo lo muestra una vez. Cierra la sesión, selecciona **Mi código**, introduce el código completo y vuelve a entrar. Comprueba que aparece el mismo nombre y que sus playlists siguen siendo propias. Un perfil nuevo no tiene historial de escucha, por lo que es normal que todavía no reciba recomendaciones; usa Ana para demostrar el cálculo con datos de semilla.
