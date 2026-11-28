@@ -42,4 +42,4 @@ SOUNDGRAPH_API_PORT=18136 docker compose -p soundgraph-eval-20261128 run --rm --
 SOUNDGRAPH_API_PORT=18136 docker compose -p soundgraph-eval-20261128 run --rm --no-deps tools python -m scripts.check_references
 ```
 
-Los scripts API y escala crean y eliminan temporalmente datos sintéticos. Ejecutarlos únicamente en un proyecto Compose nuevo y aislado. Esta evaluación se añadió como evidencia posterior; no cambia el conteo unitario/integración ni las 11 pruebas HTTP de cierre.
+Los scripts API y escala crean y eliminan temporalmente datos sintéticos. Ejecutarlos únicamente en un proyecto Compose nuevo y aislado. Esta evaluación se añadió como evidencia posterior; no cambia el conteo unitario/integración ni las 11 pruebas HTTP de cierre. Al concluir, los cuatro contenedores del proyecto evaluador quedaron detenidos y los tres volúmenes propios se conservaron; no se ejecutó `down -v`.
